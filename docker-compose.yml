@@ -1,0 +1,81 @@
+# Faqat MAHALLIY ISHLAB CHIQISH (local dev) uchun - Railway'da har bir xizmat
+# alohida-alohida joylashtiriladi (apps/*/railway.toml), bu fayl u yerda ishlatilmaydi.
+# Ishga tushirish: docker compose up --build
+name: influencex
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: influencex
+      POSTGRES_PASSWORD: influencex
+      POSTGRES_DB: influencex
+    ports:
+      - "5432:5432"
+    volumes:
+      - influencex_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U influencex"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    environment:
+      NODE_ENV: development
+      CORS_ORIGIN: "*"
+      DATABASE_URL: postgresql://influencex:influencex@postgres:5432/influencex?schema=public
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: local-dev-secret-do-not-use-in-production
+      JWT_EXPIRES_IN: 7d
+      API_PORT: 3000
+      # Qolgan maxfiy kalitlar (.env.example'ga qarang) - mahalliy testda
+      # bo'sh/soxta qiymatlar bilan ham API ishga tushadi, lekin Telegram/Click/S3
+      # bilan haqiqiy integratsiya uchun haqiqiy qiymatlar kerak bo'ladi.
+      TELEGRAM_BOT_TOKEN: "REPLACE_ME"
+      TELEGRAM_WEBHOOK_SECRET: "REPLACE_ME"
+    ports:
+      - "3000:3000"
+
+  mini-app:
+    build:
+      context: .
+      dockerfile: apps/mini-app/Dockerfile
+      args:
+        VITE_API_BASE_URL: http://localhost:3000/api/v1
+    restart: unless-stopped
+    depends_on:
+      - api
+    ports:
+      - "5173:8080"
+
+  admin:
+    build:
+      context: .
+      dockerfile: apps/admin/Dockerfile
+      args:
+        NEXT_PUBLIC_API_BASE_URL: http://localhost:3000/api/v1
+    restart: unless-stopped
+    depends_on:
+      - api
+    ports:
+      - "3001:3001"
+
+volumes:
+  influencex_pg_data:

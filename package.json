@@ -1,0 +1,24 @@
+{
+  "name": "influencex",
+  "private": true,
+  "version": "0.1.0",
+  "description": "InfluenceX - Telegram Mini App creator-business marketplace (Faza 1 MVP)",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:api": "npm run start:dev --workspace=apps/api",
+    "dev:mini-app": "npm run dev --workspace=apps/mini-app",
+    "dev:admin": "npm run dev --workspace=apps/admin",
+    "build:shared": "npm run build --workspace=packages/shared",
+    "build:api": "npm run build:shared && npm run build --workspace=apps/api",
+    "build:mini-app": "npm run build:shared && npm run build --workspace=apps/mini-app",
+    "build:admin": "npm run build:shared && npm run build --workspace=apps/admin",
+    "build": "npm run build:shared && npm run build --workspace=apps/api && npm run build --workspace=apps/mini-app && npm run build --workspace=apps/admin",
+    "lint": "npm run lint --workspaces --if-present"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

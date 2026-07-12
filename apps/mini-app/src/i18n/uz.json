@@ -1,0 +1,266 @@
+{
+  "nav": {
+    "home": "Bosh sahifa",
+    "applications": "Zayavkalar",
+    "myCampaignsTab": "Kampaniyalarim",
+    "chat": "Chat",
+    "profile": "Profil"
+  },
+  "home": {
+    "title": "Kampaniyalar",
+    "empty": "Hozircha ochiq kampaniyalar yo'q",
+    "budget": "Byudjet",
+    "deadline": "Muddat",
+    "apply": "Zayavka berish",
+    "loadMore": "Yana ko'rsatish"
+  },
+  "onboarding": {
+    "welcome": "InfluenceX'ga xush kelibsiz",
+    "chooseRole": "Siz kimsiz?",
+    "creator": "Men kreatorman",
+    "business": "Men biznesman",
+    "continue": "Davom etish"
+  },
+  "profile": {
+    "editProfile": "Profilni tahrirlash",
+    "followers": "Obunachilar",
+    "rating": "Reyting",
+    "creatorScore": "Creator Score",
+    "businessScore": "Business Score",
+    "verification": "Verifikatsiya",
+    "payoutTitle": "To'lov rekvizitlari",
+    "payoutHint": "InfluenceX hamkorlik haqini shu rekvizitlar orqali to'laydi",
+    "payoutAccountPlaceholder": "Karta raqami yoki hisob",
+    "choosePhoto": "Rasm tanlash",
+    "changePhoto": "Rasmni almashtirish",
+    "uploading": "Yuklanmoqda...",
+    "verificationHint": "Profilingizni tasdiqlash uchun hujjat yuklang (ixtiyoriy) - moderator ko'rib chiqadi.",
+    "requestVerification": "Verifikatsiya so'rash",
+    "verificationStatus": {
+      "unverified": "Tasdiqlanmagan",
+      "pending": "Ko'rib chiqilmoqda",
+      "verified": "Tasdiqlangan",
+      "rejected": "Rad etilgan"
+    },
+    "aiPriceTitle": "AI tavsiya etgan narx",
+    "nameMissing": "Ism kiritilmagan — tahrirlash uchun bosing",
+    "nameRequired": "Ismni kiriting",
+    "companyNameRequired": "Kompaniya nomini kiriting",
+    "nameField": "Ism",
+    "countryField": "Mamlakat",
+    "cityField": "Shahar",
+    "languagesField": "Tillar (kontent tili)",
+    "categoriesField": "Kategoriyalar (vergul bilan, masalan: go'zallik, sayohat)",
+    "socialLinksField": "Ijtimoiy tarmoq havolalari",
+    "avgViewsField": "O'rtacha ko'rishlar",
+    "engagementRateField": "Engagement (%)",
+    "companyNameField": "Kompaniya nomi",
+    "descriptionFieldBiz": "Kompaniya tavsifi",
+    "industryField": "Soha",
+    "websiteField": "Veb-sayt",
+    "contactPersonField": "Kontakt shaxs"
+  },
+  "ratings": {
+    "rateTitle": "Hamkorlikni baholang",
+    "rateHint": "Ish yakunlangach, boshqa tomonni baholang - bu reputatsiya tizimini (Creator Score / Business Score) shakllantiradi.",
+    "commentPlaceholder": "Izoh (ixtiyoriy)",
+    "submit": "Baho qoldirish",
+    "submitted": "Rahmat! Bahoyingiz qabul qilindi.",
+    "alreadyRated": "Siz bu hamkorlikni allaqachon baholagansiz"
+  },
+  "escrow": {
+    "awaiting_deposit": "To'lov kutilmoqda",
+    "held": "Qabul qilindi, hamkorlik haqi tayyorlanmoqda",
+    "release_pending": "Chiqim jarayonida",
+    "released": "To'landi",
+    "refunded": "Qaytarildi",
+    "disputed": "Nizoda"
+  },
+  "common": {
+    "loading": "Yuklanmoqda...",
+    "error": "Xatolik yuz berdi",
+    "save": "Saqlash",
+    "cancel": "Bekor qilish",
+    "send": "Yuborish",
+    "delete": "O'chirish"
+  },
+  "createCampaign": {
+    "title": "Kampaniya yaratish",
+    "aiTitle": "AI Brief Generator",
+    "aiHint": "Mahsulot/xizmatingizni tasvirlab bering — AI kampaniya brifini avtomatik tayyorlaydi",
+    "productPlaceholder": "Masalan: Toshkentdagi kofe do'koni, yangi avtumn menyusi...",
+    "generateBrief": "AI bilan brif yaratish",
+    "titleField": "Kampaniya sarlavhasi",
+    "descriptionField": "Tavsif",
+    "objectiveField": "Maqsad",
+    "creatorsCount": "Kreatorlar soni",
+    "submit": "Kampaniyani saqlash",
+    "barterHint": "Barter modelida siz kreatorga naqd emas, mahsulot/xizmat berasiz (masalan restoran taomi). InfluenceX orqali faqat komissiya (10%) naqd to'lanadi - mahsulotning o'zi to'g'ridan-to'g'ri kreatorga topshiriladi.",
+    "cpaHint": "CPA/Hybrid modelida siz har bir haqiqiy konversiya (sotuv, lid) uchun to'laysiz. Kreator trafigi kuzatuv havolasi orqali yo'naltiriladi.",
+    "cpaRateField": "Konversiya uchun summa (UZS)",
+    "landingUrlField": "Landing sahifa havolasi (https://...)",
+    "pureCpaWarning": "Diqqat: sof CPA'da to'lov konversiya soniga bog'liq, va bu sonni odatda siz o'zingiz qayd etasiz - bu blogerga nisbatan adolatsizlik xavfini tug'diradi (masalan sonni kamroq ko'rsatish). Agar avtomatik tasdiqlash (webhook yoki Telegram bot) ula olmasangiz, Hybrid tavsiya etiladi - kreator kafolatlangan asosiy to'lov oladi, ustiga CPA bonusi.",
+    "switchToHybrid": "Hybrid modelga o'tish"
+  },
+  "products": {
+    "title": "Mahsulotlar katalogi",
+    "hint": "Mahsulot/xizmatingizni qo'shing va \"blogerlarga ko'rinsin\"ni yoqing - avtomatik CPA kampaniyaga aylanadi, blogerlar uni feedda ko'radi va reklama qila oladi.",
+    "addNew": "Yangi mahsulot qo'shish",
+    "empty": "Hali mahsulot qo'shilmagan",
+    "nameField": "Mahsulot nomi",
+    "descriptionField": "Tavsif (ixtiyoriy)",
+    "priceField": "Narx (UZS)",
+    "cpaRateField": "Har bir sotuv uchun blogerga to'lov (UZS)",
+    "externalUrlField": "Sotuv sahifasi havolasi (Uzum/Instagram/o'z saytingiz)",
+    "externalUrlHint": "InfluenceX bu yerda checkout qilmaydi - faqat blogerni shu sahifaga yo'naltiradi. Haqiqiy sotuvni siz o'zingiz yoki webhook orqali qayd etasiz.",
+    "create": "Mahsulot qo'shish",
+    "visible": "Blogerlarga ko'rinadi",
+    "hidden": "Yashirin",
+    "makeVisible": "Blogerlarga ko'rsatish",
+    "makeHidden": "Yashirish",
+    "deleteConfirm": "Bu mahsulotni o'chirishni xohlaysizmi?"
+  },
+  "applicants": {
+    "title": "Zayavkalar",
+    "backToCampaign": "Kampaniyaga qaytish",
+    "viewApplicants": "Zayavkalarni ko'rish",
+    "empty": "Hozircha zayavkalar yo'q",
+    "followers": "obunachi",
+    "rating": "Reyting",
+    "proposedPrice": "Taklif qilingan narx",
+    "accept": "Qabul qilish",
+    "reject": "Rad etish",
+    "status": {
+      "pending": "Ko'rib chiqilmoqda",
+      "accepted": "Qabul qilindi",
+      "rejected": "Rad etildi",
+      "withdrawn": "Qaytarib olindi"
+    },
+    "aiPrice": "AI narx tavsiyasi",
+    "recommendedTitle": "AI tavsiya etgan boshqa mos kreatorlar",
+    "startPayment": "To'lovni boshlash",
+    "openCheckoutAgain": "To'lov sahifasini qayta ochish",
+    "approveAndRelease": "Ishni tasdiqlash va to'lovni chiqarish",
+    "waitingForContent": "Kreator hali kontent yubormagan - to'lovni chiqarish uchun kuting",
+    "refund": "Bekor qilish (qaytarish)",
+    "refundConfirm": "Haqiqatan ham bu escrow'ni bekor qilib, mablag'ni qaytarmoqchimisiz?"
+  },
+  "chat": {
+    "attach": "Fayl biriktirish",
+    "attachment": "📎 Ilova"
+  },
+  "dispute": {
+    "title": "Nizo ochish",
+    "reasonPlaceholder": "Nima sodir bo'lganini tavsiflab bering...",
+    "reasonTooShort": "Sababni batafsilroq yozing (kamida 5 belgi)",
+    "addEvidence": "Dalil biriktirish (rasm/video)",
+    "filesAttached": "fayl biriktirildi",
+    "submit": "Nizoni yuborish",
+    "raise": "Nizo ochish",
+    "submitted": "Nizo yuborildi. Moderator tez orada ko'rib chiqadi."
+  },
+  "applications": {
+    "submitContent": "Kontentni topshirish",
+    "contentUrlPlaceholder": "Post havolasi (Instagram/TikTok/YouTube)",
+    "contentUrlRequired": "Havola yoki fayl kiritilishi shart",
+    "uploadInstead": "yoki fayl yuklash",
+    "contentNotePlaceholder": "Izoh (ixtiyoriy)",
+    "sendContent": "Yuborish",
+    "contentSubmittedOn": "Kontent topshirildi:"
+  },
+  "conversions": {
+    "title": "Konversiyalar (CPA)",
+    "empty": "Hali konversiya qayd etilmagan",
+    "confirmedTotal": "Tasdiqlangan jami",
+    "payout": "Hamkorlik haqi",
+    "paid": "to'landi",
+    "confirm": "Tasdiqlash",
+    "reject": "Rad etish",
+    "report": "Konversiya qayd etish",
+    "submit": "Yuborish",
+    "amountField": "Summa (UZS)",
+    "trackingRefField": "Buyurtma/tranzaksiya ID (ixtiyoriy)",
+    "type": {
+      "sale": "Sotuv",
+      "lead": "Lid",
+      "registration": "Ro'yxatdan o'tish",
+      "subscription": "Obuna"
+    },
+    "status": {
+      "pending": "Kutilmoqda",
+      "confirmed": "Tasdiqlangan",
+      "rejected": "Rad etilgan"
+    }
+  },
+  "portfolio": {
+    "title": "Portfolio",
+    "hint": "Ilgari qilgan ishlaringizdan namunalar qo'shing - biznes zayavkangizni ko'rib chiqishda shularga qaraydi.",
+    "manageLink": "Portfolioni boshqarish",
+    "addItem": "Namuna qo'shish",
+    "captionPlaceholder": "Izoh (ixtiyoriy)",
+    "empty": "Hali portfolio namunasi qo'shilmagan",
+    "deleteConfirm": "Bu namunani o'chirishni xohlaysizmi?"
+  },
+  "earnings": {
+    "title": "Daromadlar",
+    "totalEarned": "Jami ishlab topilgan",
+    "pending": "Kutilmoqda",
+    "history": "Tarix",
+    "empty": "Hali tranzaksiya yo'q",
+    "typeEscrow": "Kampaniya to'lovi",
+    "typeConversion": "CPA konversiya"
+  },
+  "payments": {
+    "title": "To'lovlar",
+    "totalSpent": "Jami sarflangan",
+    "pending": "Kutilmoqda",
+    "history": "Tarix",
+    "empty": "Hali tranzaksiya yo'q"
+  },
+  "analytics": {
+    "title": "Analitika",
+    "applicationsFunnel": "Zayavkalar funneli",
+    "total": "Jami",
+    "acceptanceRate": "Qabul qilinish darajasi",
+    "campaignsCompleted": "Tugatilgan kampaniyalar",
+    "cpaPerformance": "CPA ko'rsatkichlari",
+    "clicks": "Bosishlar",
+    "conversions": "Konversiyalar",
+    "conversionRate": "Konversiya darajasi",
+    "campaignsByStatus": "Kampaniyalar holati bo'yicha",
+    "topCreators": "Eng ishonchli kreatorlar",
+    "acceptedCampaigns": "ta qabul qilingan"
+  },
+  "myCampaigns": {
+    "title": "Mening kampaniyalarim",
+    "empty": "Hali kampaniya yaratmagansiz.",
+    "applicants": "Zayavkachilar",
+    "featuredUntil": "Featured (muddati:",
+    "featured": "Featured (targ'ib qilingan)",
+    "cancel": "Bekor qilish",
+    "cancelConfirm": "Bu kampaniyani bekor qilishni xohlaysizmi?",
+    "feature": "Targ'ib qilish (7 kun)",
+    "advanceTo": {
+      "published": "E'lon qilish",
+      "in_progress": "Boshlash",
+      "completed": "Yakunlash"
+    }
+  },
+  "featured": {
+    "creatorTitle": "Profilni targ'ib qilish",
+    "creatorHint": "Profilingiz biznes tomonidan ko'proq ko'rinadi va AI tavsiyalarida yuqoriroq chiqadi.",
+    "promoteProfile": "7 kunga targ'ib qilish",
+    "activeUntil": "Targ'ib qilingan, muddati:"
+  },
+  "subscription": {
+    "title": "Tarif rejasi",
+    "hint": "Tarif rejangiz bir vaqtda nechta faol (e'lon qilingan) kampaniya olib borishingiz mumkinligini belgilaydi.",
+    "unlimited": "cheksiz",
+    "campaignsSuffix": "ta faol kampaniya",
+    "plan": {
+      "starter": "Starter",
+      "growth": "Growth",
+      "pro": "Pro"
+    }
+  }
+}

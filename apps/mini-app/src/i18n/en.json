@@ -1,0 +1,266 @@
+{
+  "nav": {
+    "home": "Home",
+    "applications": "Applications",
+    "myCampaignsTab": "My Campaigns",
+    "chat": "Chat",
+    "profile": "Profile"
+  },
+  "home": {
+    "title": "Campaigns",
+    "empty": "No open campaigns yet",
+    "budget": "Budget",
+    "deadline": "Deadline",
+    "apply": "Apply",
+    "loadMore": "Load more"
+  },
+  "onboarding": {
+    "welcome": "Welcome to InfluenceX",
+    "chooseRole": "Who are you?",
+    "creator": "I'm a creator",
+    "business": "I'm a business",
+    "continue": "Continue"
+  },
+  "profile": {
+    "editProfile": "Edit profile",
+    "followers": "Followers",
+    "rating": "Rating",
+    "creatorScore": "Creator Score",
+    "businessScore": "Business Score",
+    "verification": "Verification",
+    "payoutTitle": "Payout details",
+    "payoutHint": "InfluenceX pays your collaboration fee using these details",
+    "payoutAccountPlaceholder": "Card or account number",
+    "choosePhoto": "Choose photo",
+    "changePhoto": "Change photo",
+    "uploading": "Uploading...",
+    "verificationHint": "Upload a document to verify your profile (optional) - a moderator will review it.",
+    "requestVerification": "Request verification",
+    "verificationStatus": {
+      "unverified": "Unverified",
+      "pending": "Pending",
+      "verified": "Verified",
+      "rejected": "Rejected"
+    },
+    "aiPriceTitle": "AI-recommended price",
+    "nameMissing": "Name not set — tap to fill in",
+    "nameRequired": "Enter a name",
+    "companyNameRequired": "Enter a company name",
+    "nameField": "Name",
+    "countryField": "Country",
+    "cityField": "City",
+    "languagesField": "Languages (content language)",
+    "categoriesField": "Categories (comma-separated, e.g.: beauty, travel)",
+    "socialLinksField": "Social links",
+    "avgViewsField": "Average views",
+    "engagementRateField": "Engagement (%)",
+    "companyNameField": "Company name",
+    "descriptionFieldBiz": "Company description",
+    "industryField": "Industry",
+    "websiteField": "Website",
+    "contactPersonField": "Contact person"
+  },
+  "ratings": {
+    "rateTitle": "Rate the collaboration",
+    "rateHint": "Once the work is done, rate the other party - this drives the reputation system (Creator Score / Business Score).",
+    "commentPlaceholder": "Comment (optional)",
+    "submit": "Submit rating",
+    "submitted": "Thanks! Your rating was submitted.",
+    "alreadyRated": "You already rated this collaboration"
+  },
+  "escrow": {
+    "awaiting_deposit": "Awaiting deposit",
+    "held": "Received, payout in preparation",
+    "release_pending": "Payout in progress",
+    "released": "Paid",
+    "refunded": "Refunded",
+    "disputed": "Disputed"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "save": "Save",
+    "cancel": "Cancel",
+    "send": "Send",
+    "delete": "Delete"
+  },
+  "createCampaign": {
+    "title": "Create campaign",
+    "aiTitle": "AI Brief Generator",
+    "aiHint": "Describe your product/service — AI will draft a campaign brief automatically",
+    "productPlaceholder": "E.g. a coffee shop in Tashkent, new autumn menu...",
+    "generateBrief": "Generate brief with AI",
+    "titleField": "Campaign title",
+    "descriptionField": "Description",
+    "objectiveField": "Objective",
+    "creatorsCount": "Number of creators",
+    "submit": "Save campaign",
+    "barterHint": "In the Barter model you give the creator a product/service instead of cash (e.g. a restaurant meal). Only the commission (10%) is paid in cash through InfluenceX - the product itself is handed to the creator directly.",
+    "cpaHint": "In CPA/Hybrid model you pay for each real conversion (sale, lead). The creator's traffic is routed through a tracking link.",
+    "cpaRateField": "Amount per conversion (UZS)",
+    "landingUrlField": "Landing page URL (https://...)",
+    "pureCpaWarning": "Note: in pure CPA, payment depends on the conversion count, and you usually report that count yourself - this creates a risk of unfairness toward the creator (e.g. under-reporting). If you can't connect automatic confirmation (webhook or Telegram bot), Hybrid is recommended - the creator gets a guaranteed base payment plus a CPA bonus.",
+    "switchToHybrid": "Switch to Hybrid"
+  },
+  "products": {
+    "title": "Product catalog",
+    "hint": "Add a product/service and turn on \"visible to creators\" - it automatically becomes a CPA campaign, creators will see it in the feed and can promote it.",
+    "addNew": "Add product",
+    "empty": "No products added yet",
+    "nameField": "Product name",
+    "descriptionField": "Description (optional)",
+    "priceField": "Price (UZS)",
+    "cpaRateField": "Payout to creator per sale (UZS)",
+    "externalUrlField": "Sales page URL (Uzum/Instagram/your site)",
+    "externalUrlHint": "InfluenceX does not run checkout here - it only routes the creator to this page. You record the actual sale yourself or via webhook.",
+    "create": "Add product",
+    "visible": "Visible to creators",
+    "hidden": "Hidden",
+    "makeVisible": "Show to creators",
+    "makeHidden": "Hide",
+    "deleteConfirm": "Delete this product?"
+  },
+  "applicants": {
+    "title": "Applicants",
+    "backToCampaign": "Back to campaign",
+    "viewApplicants": "View applicants",
+    "empty": "No applicants yet",
+    "followers": "followers",
+    "rating": "Rating",
+    "proposedPrice": "Proposed price",
+    "accept": "Accept",
+    "reject": "Reject",
+    "status": {
+      "pending": "Pending",
+      "accepted": "Accepted",
+      "rejected": "Rejected",
+      "withdrawn": "Withdrawn"
+    },
+    "aiPrice": "AI price suggestion",
+    "recommendedTitle": "Other AI-recommended creators",
+    "startPayment": "Start payment",
+    "openCheckoutAgain": "Reopen checkout page",
+    "approveAndRelease": "Approve & release payment",
+    "waitingForContent": "Creator hasn't submitted content yet - wait before releasing payment",
+    "refund": "Cancel (refund)",
+    "refundConfirm": "Are you sure you want to cancel this escrow and refund the funds?"
+  },
+  "chat": {
+    "attach": "Attach file",
+    "attachment": "📎 Attachment"
+  },
+  "dispute": {
+    "title": "Raise a dispute",
+    "reasonPlaceholder": "Describe what happened...",
+    "reasonTooShort": "Please describe the reason in more detail (min 5 characters)",
+    "addEvidence": "Attach evidence (photo/video)",
+    "filesAttached": "file(s) attached",
+    "submit": "Submit dispute",
+    "raise": "Raise dispute",
+    "submitted": "Dispute submitted. A moderator will review it soon."
+  },
+  "applications": {
+    "submitContent": "Submit content",
+    "contentUrlPlaceholder": "Post link (Instagram/TikTok/YouTube)",
+    "contentUrlRequired": "Enter a link or upload a file",
+    "uploadInstead": "or upload a file",
+    "contentNotePlaceholder": "Note (optional)",
+    "sendContent": "Send",
+    "contentSubmittedOn": "Content submitted:"
+  },
+  "conversions": {
+    "title": "Conversions (CPA)",
+    "empty": "No conversions reported yet",
+    "confirmedTotal": "Confirmed total",
+    "payout": "Payout",
+    "paid": "paid",
+    "confirm": "Confirm",
+    "reject": "Reject",
+    "report": "Report conversion",
+    "submit": "Submit",
+    "amountField": "Amount (UZS)",
+    "trackingRefField": "Order/transaction ID (optional)",
+    "type": {
+      "sale": "Sale",
+      "lead": "Lead",
+      "registration": "Registration",
+      "subscription": "Subscription"
+    },
+    "status": {
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "rejected": "Rejected"
+    }
+  },
+  "portfolio": {
+    "title": "Portfolio",
+    "hint": "Add samples of past work - businesses will see these when reviewing your application.",
+    "manageLink": "Manage portfolio",
+    "addItem": "Add sample",
+    "captionPlaceholder": "Caption (optional)",
+    "empty": "No portfolio items yet",
+    "deleteConfirm": "Delete this item?"
+  },
+  "earnings": {
+    "title": "Earnings",
+    "totalEarned": "Total earned",
+    "pending": "Pending",
+    "history": "History",
+    "empty": "No transactions yet",
+    "typeEscrow": "Campaign payment",
+    "typeConversion": "CPA conversion"
+  },
+  "payments": {
+    "title": "Payments",
+    "totalSpent": "Total spent",
+    "pending": "Pending",
+    "history": "History",
+    "empty": "No transactions yet"
+  },
+  "analytics": {
+    "title": "Analytics",
+    "applicationsFunnel": "Applications funnel",
+    "total": "Total",
+    "acceptanceRate": "Acceptance rate",
+    "campaignsCompleted": "Campaigns completed",
+    "cpaPerformance": "CPA performance",
+    "clicks": "Clicks",
+    "conversions": "Conversions",
+    "conversionRate": "Conversion rate",
+    "campaignsByStatus": "Campaigns by status",
+    "topCreators": "Top creators",
+    "acceptedCampaigns": "accepted"
+  },
+  "myCampaigns": {
+    "title": "My Campaigns",
+    "empty": "You haven't created a campaign yet.",
+    "applicants": "Applicants",
+    "featuredUntil": "Featured (until:",
+    "featured": "Featured (promoted)",
+    "cancel": "Cancel",
+    "cancelConfirm": "Cancel this campaign?",
+    "feature": "Feature (7 days)",
+    "advanceTo": {
+      "published": "Publish",
+      "in_progress": "Start",
+      "completed": "Complete"
+    }
+  },
+  "featured": {
+    "creatorTitle": "Promote profile",
+    "creatorHint": "Your profile gets more visibility to businesses and ranks higher in AI recommendations.",
+    "promoteProfile": "Promote for 7 days",
+    "activeUntil": "Featured until:"
+  },
+  "subscription": {
+    "title": "Subscription plan",
+    "hint": "Your plan determines how many active (published) campaigns you can run at once.",
+    "unlimited": "unlimited",
+    "campaignsSuffix": "active campaigns",
+    "plan": {
+      "starter": "Starter",
+      "growth": "Growth",
+      "pro": "Pro"
+    }
+  }
+}

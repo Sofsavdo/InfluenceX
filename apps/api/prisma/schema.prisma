@@ -1,0 +1,603 @@
+// InfluenceX - Faza 1 MVP ma'lumotlar bazasi sxemasi
+// PRD v2 §4 asosida. PostgreSQL.
+
+generator client {
+  provider      = "prisma-client-js"
+  // "native" - mahalliy ishlab chiqish (Windows/Mac/Linux-glibc) uchun.
+  // "linux-musl-openssl-3.0.x" - Docker'da node:20-ALPINE image (musl libc) uchun SHART,
+  // aks holda konteynerda "Prisma Client could not locate the Query Engine" xatosi
+  // bilan ishga tushmaydi (2026-07-11, Docker/Railway tayyorgarligi paytida topildi).
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Enumlar (packages/shared/src/enums.ts bilan bir xil qiymatlarda saqlanadi)
+// ---------------------------------------------------------------------------
+
+enum UserRole {
+  CREATOR
+  BUSINESS
+  MODERATOR
+  ADMIN
+}
+
+enum CreatorTier {
+  MICRO
+  MEDIUM
+  LARGE
+  UGC
+}
+
+enum Platform {
+  INSTAGRAM
+  TIKTOK
+  YOUTUBE
+  TELEGRAM
+}
+
+enum CollaborationModel {
+  FIXED
+  BARTER
+  CPA
+  HYBRID
+}
+
+enum ContentType {
+  REEL
+  STORY
+  POST
+  UGC_VIDEO
+  PRODUCT_REVIEW
+  VOICE_REVIEW
+  SHORT_VIDEO
+  LONG_VIDEO
+  YOUTUBE_INTEGRATION
+}
+
+enum CampaignStatus {
+  DRAFT
+  PUBLISHED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum ApplicationStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  WITHDRAWN
+}
+
+enum EscrowStatus {
+  AWAITING_DEPOSIT
+  HELD
+  RELEASE_PENDING
+  RELEASED
+  REFUNDED
+  DISPUTED
+}
+
+enum PaymentProvider {
+  PAYME
+  CLICK
+  UZUM
+}
+
+enum VerificationStatus {
+  UNVERIFIED
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+enum DisputeStatus {
+  OPEN
+  UNDER_REVIEW
+  RESOLVED_CREATOR
+  RESOLVED_BUSINESS
+  RESOLVED_SPLIT
+}
+
+enum Language {
+  uz
+  ru
+  en
+}
+
+// PRD "CPA (Cost Per Action)": Creator earns for each successful conversion
+// (Sale/Lead/Registration/Subscription). 2026-07-11 qo'shildi - avval CPA faqat
+// enum sifatida tanlanardi, haqiqiy kuzatuv/hisoblash tizimi yo'q edi.
+enum ConversionType {
+  SALE
+  LEAD
+  REGISTRATION
+  SUBSCRIPTION
+}
+
+enum ConversionStatus {
+  PENDING   // biznes tomonidan qayd etildi, hali tasdiqlanmagan
+  CONFIRMED // biznes tasdiqladi - kreatorga to'lanishi kerak
+  REJECTED  // spam/soxta deb topildi
+}
+
+// CPA atributsiya ishonch darajasi (2026-07-12, "kim nechta sotdi" nizosini yumshatish uchun
+// qo'shildi). Kuchli tartibda: WEBHOOK (biznesning o'z tizimi hodisa sodir bo'lganda avtomatik
+// signal beradi - eng ishonchli, qo'lda tahrirlab bo'lmaydi) > TELEGRAM_DEEPLINK (bot orqali
+// klik/start hodisasi qayd etildi) > PROMO_CODE (moderator tomonidan qo'lda tasdiqlangan
+// chegirma-kod hisobot) > SELF_REPORTED (hech qanday tashqi dalilsiz, faqat biznesning o'zi
+// aytgan raqam - eng zaif, faqat boshqa iloji bo'lmaganda ishlatiladi).
+enum ConversionSource {
+  SELF_REPORTED
+  TELEGRAM_DEEPLINK
+  WEBHOOK
+  PROMO_CODE
+}
+
+// PRD "Subscription Plans": Starter (3 faol kampaniya) / Growth (20) / Pro (cheksiz).
+// 2026-07-11 qo'shildi.
+enum SubscriptionPlan {
+  STARTER
+  GROWTH
+  PRO
+}
+
+// ---------------------------------------------------------------------------
+// Foydalanuvchi va profillar
+// ---------------------------------------------------------------------------
+
+model User {
+  id             String   @id @default(uuid())
+  // Creator/Business — Telegram orqali (PRD v2 §2). Moderator/Admin — Admin Panel
+  // (Next.js, desktop brauzer) uchun email+parol orqali kiradi, shuning uchun
+  // telegramId ular uchun bo'sh bo'lishi mumkin.
+  telegramId       BigInt?  @unique
+  telegramUsername String?
+  email            String?  @unique
+  passwordHash     String?
+  role           UserRole
+  language       Language @default(uz)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  creatorProfile  CreatorProfile?
+  businessProfile BusinessProfile?
+
+  verificationRequests VerificationRequest[]
+  sentMessages          ChatMessage[]          @relation("MessageSender")
+  ratingsGiven          Rating[]               @relation("RatingAuthor")
+  ratingsReceived       Rating[]               @relation("RatingTarget")
+
+  @@map("users")
+}
+
+model CreatorProfile {
+  id               String              @id @default(uuid())
+  userId           String              @unique
+  user             User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // PRD "Featured Placement": "Creators can promote profiles" - 2026-07-11 qo'shildi.
+  isFeatured       Boolean             @default(false)
+  featuredUntil    DateTime?
+
+  name             String
+  avatarUrl        String?
+  country          String?
+  city             String?
+  languages        Language[]
+  categories       String[]
+  socialLinks      Json                @default("{}") // { INSTAGRAM: "url", TIKTOK: "url", ... }
+
+  followers        Int                 @default(0)
+  avgViews         Int                 @default(0)
+  engagementRate   Float               @default(0)
+  tier             CreatorTier         @default(MICRO)
+
+  portfolioItems   PortfolioItem[]
+
+  rating           Float               @default(0) // 0-5, sharhlar o'rtachasi
+  creatorScore     Int                 @default(0) // 0-100, PRD v1 Reputatsiya tizimi
+  verificationStatus VerificationStatus @default(UNVERIFIED)
+
+  // InfluenceX kreatorga hamkorlik haqini shu rekvizitlar orqali to'laydi
+  // (PRD v2 §4.5: InfluenceX -> Creator, o'z pudratchisiga xarajat sifatida to'lov).
+  payoutProvider   PaymentProvider?
+  payoutAccount    String?             // Uzcard/Humo karta raqami yoki Payme/Click hisob identifikatori
+
+  applications     CampaignApplication[]
+
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+
+  @@index([country])
+  @@index([tier])
+  @@index([followers])
+  @@map("creator_profiles")
+}
+
+model PortfolioItem {
+  id        String         @id @default(uuid())
+  creatorId String
+  creator   CreatorProfile @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  mediaUrl  String
+  caption   String?
+  createdAt DateTime       @default(now())
+
+  @@map("portfolio_items")
+}
+
+model BusinessProfile {
+  id                 String              @id @default(uuid())
+  userId             String              @unique
+  user               User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  companyName        String
+  logoUrl            String?
+  description        String?
+  industry           String?
+  website            String?
+  contactPerson      String?
+
+  businessScore      Int                 @default(0) // 0-100
+  verificationStatus VerificationStatus  @default(UNVERIFIED)
+
+  // PRD "Subscription Plans" - 2026-07-11 qo'shildi. Cheklov campaigns.service.ts#updateStatus'da
+  // amalga oshiriladi (faol - PUBLISHED/IN_PROGRESS - kampaniyalar soni ustidan).
+  subscriptionPlan   SubscriptionPlan    @default(STARTER)
+
+  campaigns          Campaign[]
+  // PRD kelajak reja "Shop Integrations"/"Affiliate System" - 2026-07-12 qo'shildi (yengil
+  // versiya, to'liq onlayn do'kon/domain ulash EMAS). Biznes mahsulot ro'yxatini yuklaydi,
+  // "blogerlarga ko'rinsin" belgisi orqali mavjud CPA kampaniya infratuzilmasidan (Campaign/
+  // CampaignApplication/Conversion) qayta foydalanadi - product-catalog.md'ga qarang.
+  products           Product[]
+
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+
+  @@map("business_profiles")
+}
+
+// ---------------------------------------------------------------------------
+// Kampaniyalar / Zayavkalar
+// ---------------------------------------------------------------------------
+
+model Campaign {
+  id                 String             @id @default(uuid())
+  businessId         String
+  business           BusinessProfile    @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  title              String
+  description        String
+  productOrService   String
+  objective          String
+  contentType        ContentType
+  collaborationModel CollaborationModel
+  budget             Decimal            @db.Decimal(14, 2)
+  currency           String             @default("UZS")
+  creatorsCount      Int                @default(1)
+  deadline           DateTime
+  requirements       Json               @default("{}")
+
+  // CPA/HYBRID modellar uchun (PRD "CPA": "10,000 UZS per successful sale") - 2026-07-11.
+  cpaRate            Decimal?           @db.Decimal(14, 2) // har bir tasdiqlangan konversiya uchun summa
+  landingUrl         String?            // kreator trafigi yo'naltiriladigan sahifa (/track/:applicationId orqali)
+
+  // PRD "Featured Placement": "Businesses can promote campaigns" - 2026-07-11 qo'shildi.
+  // Ommaviy feedda (campaigns.service.ts#findPublic) featuredUntil > hozir bo'lganlar birinchi ko'rsatiladi.
+  isFeatured         Boolean            @default(false)
+  featuredUntil      DateTime?
+
+  // Mahsulotlar katalogidan avtomatik yaratilgan CPA kampaniya belgisi (2026-07-12) -
+  // Mini App'da "Mahsulot" belgisini ko'rsatish uchun (Product.linkedCampaignId orqali
+  // qayta so'rov yubormasdan). Qo'lda yozilgan brif kampaniyalarida false.
+  isProductListing   Boolean            @default(false)
+  product            Product?
+
+  // Tashqi (biznesning o'z sayti/ilovasi/boti) tizimidan konversiya hodisasini avtomatik
+  // qabul qilish uchun imzo kaliti (2026-07-12, ConversionsController#webhook). Bu Click
+  // webhook'idagi kabi maydonlarni birlashtirib SHA-256 bilan imzolanadi (raw-body HMAC emas -
+  // click.provider.ts'dagi mavjud naqshga mos).
+  webhookSecret      String?            @default(cuid())
+
+  status             CampaignStatus     @default(DRAFT)
+
+  applications       CampaignApplication[]
+
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  @@index([status])
+  @@index([businessId])
+  @@map("campaigns")
+}
+
+model CampaignApplication {
+  id             String            @id @default(uuid())
+  campaignId     String
+  campaign       Campaign          @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  creatorId      String
+  creator        CreatorProfile    @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+
+  message        String?
+  proposedPrice  Decimal?          @db.Decimal(14, 2)
+  status         ApplicationStatus @default(PENDING)
+
+  // Kontent topshirish bosqichi (PRD v2 §4.3 workflow 8-9: "Creator submits content ->
+  // Business approves") - 2026-07-11 qo'shildi. approveAndRelease() shu maydon to'ldirilmagan
+  // bo'lsa to'lovni chiqarishga ruxsat bermaydi (escrow.service.ts).
+  contentSubmittedAt DateTime?
+  contentUrls        String[]      @default([])
+  contentNote        String?
+
+  // CPA trafik kuzatuvi (/track/:applicationId -> campaign.landingUrl'ga 302 redirect).
+  clickCount     Int               @default(0)
+  conversions    Conversion[]
+
+  // CPA atributsiya (2026-07-12): har bir zayavka o'ziga xos noyob kodga ega - bloger buni
+  // o'z referal havolasi/promo-kodi sifatida tarqatadi (Telegram deep-link: t.me/<bot>?start=ref_<kod>,
+  // yoki tashqi webhook so'rovida "referralCode" maydoni sifatida). Shu orqali qaysi konversiya
+  // aynan shu blogerga tegishli ekanligi aniqlanadi.
+  referralCode   String            @unique @default(cuid())
+
+  escrow         Escrow?
+  chatThread     ChatThread?
+
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+
+  @@unique([campaignId, creatorId])
+  @@index([creatorId])
+  @@map("campaign_applications")
+}
+
+// PRD "CPA": har bir tasdiqlangan konversiya (sotuv/lid/ro'yxatdan o'tish) alohida yozuv
+// sifatida saqlanadi. Click'da avtomatik chiqim API'si yo'qligi sababli (escrow.service.ts
+// bilan bir xil cheklov), to'lov moderator/biznes tomonidan qo'lda amalga oshirilib,
+// markPaid() orqali belgilanadi - xuddi Escrow'ning confirmManualPayout() naqshi kabi.
+model Conversion {
+  id            String              @id @default(uuid())
+  applicationId String
+  application   CampaignApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  type          ConversionType
+  amount        Decimal             @db.Decimal(14, 2) // biznes to'lashga rozi bo'lgan yalpi summa
+  platformFee   Decimal             @db.Decimal(14, 2) // InfluenceX komissiyasi (PLATFORM_COMMISSION_RATES.CPA)
+  payoutAmount  Decimal             @db.Decimal(14, 2) // amount - platformFee, kreatorga to'lanadigan summa
+
+  status        ConversionStatus    @default(PENDING)
+  // 2026-07-12: qaysi mexanizm orqali qayd etilgani - ishonch darajasini bildiradi
+  // (ConversionSource izohiga qarang). WEBHOOK manbali konversiyalar avtomatik CONFIRMED
+  // holatida yaratiladi (conversions.service.ts#reportViaWebhook) - biznesning "tasdiqlash"
+  // bosqichini qo'lda o'tkazib yuborishga (va shu bilan raqamni tanlab yashirishga) imkon bermaydi.
+  source        ConversionSource    @default(SELF_REPORTED)
+  trackingRef   String?             // tashqi buyurtma/tranzaksiya ID yoki promo-kod (ixtiyoriy)
+  note          String?
+
+  paidAt          DateTime?
+  payoutReference String?
+
+  createdAt     DateTime            @default(now())
+  confirmedAt   DateTime?
+
+  @@index([applicationId])
+  @@index([status])
+  @@map("conversions")
+}
+
+// PRD kelajak reja "Shop Integrations" - yengil versiya (2026-07-12). To'liq onlayn do'kon/
+// domain ulash EMAS - faqat mahsulot ro'yxati + "blogerlarga ko'rinsin" belgisi. Yoqilganda
+// avtomatik ravishda CPA Campaign yaratiladi/nashr etiladi (products.service.ts#setVisibility) -
+// shu orqali mavjud kampaniya/zayavka/konversiya infratuzilmasi to'liq qayta ishlatiladi,
+// alohida "do'kon" ekrani yoki checkout qurilmaydi.
+model Product {
+  id                String          @id @default(uuid())
+  businessId        String
+  business          BusinessProfile @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  name              String
+  description       String?
+  imageUrl          String?
+  price             Decimal         @db.Decimal(14, 2) // mahsulot/xizmat narxi (axborot uchun)
+  currency          String          @default("UZS")
+  // Mahsulotning haqiqiy sotuv/buyurtma sahifasi - Uzum Market e'loni, Instagram/Telegram
+  // do'koni yoki biznesning o'z sayti bo'lishi mumkin. InfluenceX bu yerda checkout QILMAYDI -
+  // faqat kreator trafigini shu sahifaga yo'naltiradi (Campaign.landingUrl sifatida ishlatiladi).
+  externalUrl       String
+  cpaRate           Decimal         @db.Decimal(14, 2) // har bir tasdiqlangan konversiya uchun kreatorga to'lanadigan summa
+  contentType       ContentType     @default(REEL) // avtomatik CPA kampaniyada so'raladigan kontent turi
+
+  visibleToCreators Boolean         @default(false)
+  linkedCampaignId  String?         @unique
+  linkedCampaign    Campaign?       @relation(fields: [linkedCampaignId], references: [id])
+
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  @@index([businessId])
+  @@map("products")
+}
+
+// ---------------------------------------------------------------------------
+// To'lov ledgeri (ilgari "Escrow" deb nomlangan) — PRD v2 §4.5 (2026-07-11 yangilanishi):
+// InfluenceX uchinchi shaxs mablag'ini custody qilmaydi. Ikkita mustaqil bitim:
+//   1) Biznes -> InfluenceX: Xizmat ko'rsatish shartnomasi (kampaniya boshqaruvi xizmati),
+//      "amount" InfluenceX'ning savdo daromadi sifatida qabul qilinadi (serviceInvoiceRef).
+//   2) InfluenceX -> Creator: Hamkorlik/pudratchi shartnomasi, "payoutAmount" InfluenceX'ning
+//      o'z pudratchisiga xarajati sifatida to'lanadi (payoutContractRef).
+// Model nomi "Escrow" saqlab qolindi (kod bazasida keng ishlatiladi va foydalanuvchiga
+// "himoyalangan to'lov" sifatida taqdim etiladi), lekin huquqiy tabiati custody emas.
+// ---------------------------------------------------------------------------
+
+model Escrow {
+  id               String              @id @default(uuid())
+  applicationId    String              @unique
+  application      CampaignApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  amount           Decimal             @db.Decimal(14, 2) // e'lon qilingan bitim qiymati (FIXED/CPA/HYBRID uchun naqd pul; BARTER uchun mahsulot/xizmat qiymati - hisobot uchun, naqd emas)
+  currency         String              @default("UZS")
+  commissionRate   Float               // CollaborationModel bo'yicha PLATFORM_COMMISSION_RATES
+  platformFee      Decimal             @db.Decimal(14, 2) // InfluenceX xizmat daromadining bir qismi (marja)
+  payoutAmount     Decimal             @db.Decimal(14, 2) // amount - platformFee; kreatorga hamkorlik haqi sifatida to'lanadi (BARTER uchun 0 - kreator mahsulot/xizmatni to'g'ridan-to'g'ri biznesdan oladi, naqd pul InfluenceX orqali o'tmaydi)
+  // PRD "Barter" (2026-07-12 tuzatildi): biznes HAQIQATDA naqd to'laydigan summa. FIXED/CPA/HYBRID
+  // uchun = amount (to'liq bitim summasi InfluenceX orqali o'tadi). BARTER uchun = platformFee
+  // (faqat komissiya naqd to'lanadi - mahsulot/xizmatning o'zi InfluenceX orqali emas, to'g'ridan-
+  // to'g'ri biznesdan kreatorga beriladi). Avval bu farqlanmagan edi - Barter kampaniyalarda ham
+  // biznesdan TO'LIQ mahsulot qiymatini Click orqali naqd talab qilardi, bu "barter" tushunchasiga
+  // ziddir.
+  depositAmount    Decimal             @db.Decimal(14, 2)
+
+  status           EscrowStatus        @default(AWAITING_DEPOSIT)
+  provider         PaymentProvider?
+  depositReference String?             // Payme/Click/Uzum tranzaksiya ID (biznes to'lovi - xizmat daromadi)
+  payoutReference  String?             // Payme/Click/Uzum tranzaksiya ID (kreatorga to'lov - InfluenceX xarajati)
+
+  serviceInvoiceRef  String?           // Biznes bilan "Xizmat ko'rsatish shartnomasi" akt/invoys raqami
+  payoutContractRef  String?           // Kreator bilan "Hamkorlik shartnomasi" havolasi/raqami
+
+  transactions     EscrowTransaction[]
+  dispute          Dispute?
+  clickTransactions ClickTransaction[]
+
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+
+  @@index([status])
+  @@index([depositReference])
+  @@map("escrows")
+}
+
+// Har bir holat o'zgarishi audit uchun alohida yozuv sifatida saqlanadi
+// (moliyaviy nazorat va nizolarda dalil sifatida ishlatiladi).
+model EscrowTransaction {
+  id        String       @id @default(uuid())
+  escrowId  String
+  escrow    Escrow       @relation(fields: [escrowId], references: [id], onDelete: Cascade)
+  fromStatus EscrowStatus?
+  toStatus  EscrowStatus
+  note      String?
+  actorUserId String?
+  createdAt DateTime     @default(now())
+
+  @@index([escrowId])
+  @@map("escrow_transactions")
+}
+
+model Dispute {
+  id           String        @id @default(uuid())
+  escrowId     String        @unique
+  escrow       Escrow        @relation(fields: [escrowId], references: [id], onDelete: Cascade)
+  raisedByUserId String
+  reason       String
+  evidenceUrls String[]
+  status       DisputeStatus @default(OPEN)
+  resolutionNote String?
+  moderatorId  String?
+  createdAt    DateTime      @default(now())
+  resolvedAt   DateTime?
+
+  @@index([status])
+  @@map("disputes")
+}
+
+enum ClickTransactionStatus {
+  PREPARED   // Prepare bosqichi muvaffaqiyatli o'tdi, Complete kutilmoqda
+  CONFIRMED  // Complete bosqichi error=0 bilan yakunlandi (to'lov muvaffaqiyatli)
+  CANCELLED  // Complete bosqichi error<0 bilan yakunlandi yoki Click tomonidan bekor qilindi
+}
+
+// Click Shop-API (Prepare/Complete) oqimi uchun - PRD v2 §4.5.
+// merchant_prepare_id sifatida shu jadvalning autoincrement "id"si Click'ga qaytariladi,
+// Complete so'rovida Click uni orqaga qaytaradi - shu orqali tranzaksiyani topamiz.
+// Rasmiy hujjat: https://docs.click.uz/en/click-api-request/
+model ClickTransaction {
+  id            Int                     @id @default(autoincrement())
+  escrowId      String
+  escrow        Escrow                  @relation(fields: [escrowId], references: [id], onDelete: Cascade)
+
+  clickTransId  BigInt                  @unique // Click tizimidagi to'lov urinishi ID (har Prepare'da yangi)
+  clickPaydocId BigInt?
+  amount        Decimal                 @db.Decimal(14, 2)
+  status        ClickTransactionStatus  @default(PREPARED)
+
+  createdAt     DateTime                @default(now())
+  confirmedAt   DateTime?
+
+  @@map("click_transactions")
+}
+
+// ---------------------------------------------------------------------------
+// Chat
+// ---------------------------------------------------------------------------
+
+model ChatThread {
+  id            String               @id @default(uuid())
+  applicationId String               @unique
+  application   CampaignApplication  @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  messages      ChatMessage[]
+  createdAt     DateTime             @default(now())
+
+  @@map("chat_threads")
+}
+
+model ChatMessage {
+  id           String     @id @default(uuid())
+  threadId     String
+  thread       ChatThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  senderId     String
+  sender       User       @relation("MessageSender", fields: [senderId], references: [id])
+  body         String?
+  attachmentUrl String?
+  createdAt    DateTime   @default(now())
+
+  @@index([threadId])
+  @@map("chat_messages")
+}
+
+// ---------------------------------------------------------------------------
+// Reyting / Verifikatsiya
+// ---------------------------------------------------------------------------
+
+// PRD "Reputation System" (2026-07-12 xavfsizlik tuzatishi): avval bu modelga istalgan
+// autentifikatsiyalangan foydalanuvchi, hech qanday egalik/hamkorlik tekshiruvisiz, istalgan
+// boshqa userga baho qo'ya olardi (POST /ratings hech qanday guard/tekshiruv qilmasdi) - bu
+// "review bombing" firibgarligiga ochiq edi. Endi campaignId MAJBURIY va ratings.service.ts#create
+// haqiqiy tugallangan hamkorlikni (campaign ichida authorId<->targetId orasida ACCEPTED zayavka
+// borligini) tekshiradi, shuningdek bitta kampaniya uchun bitta muallif faqat bitta marta baho
+// qo'ya oladi (@@unique quyida).
+model Rating {
+  id           String   @id @default(uuid())
+  authorId     String
+  author       User     @relation("RatingAuthor", fields: [authorId], references: [id])
+  targetId     String
+  target       User     @relation("RatingTarget", fields: [targetId], references: [id])
+  campaignId   String
+  score        Int      // 1-5
+  comment      String?
+  createdAt    DateTime @default(now())
+
+  @@unique([authorId, targetId, campaignId])
+  @@index([targetId])
+  @@map("ratings")
+}
+
+model VerificationRequest {
+  id          String             @id @default(uuid())
+  userId      String
+  user        User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  documentUrl String?
+  note        String?
+  status      VerificationStatus @default(PENDING)
+  reviewedBy  String?
+  createdAt   DateTime           @default(now())
+  reviewedAt  DateTime?
+
+  @@index([userId])
+  @@index([status])
+  @@map("verification_requests")
+}

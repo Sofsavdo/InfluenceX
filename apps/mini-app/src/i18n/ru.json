@@ -1,0 +1,266 @@
+{
+  "nav": {
+    "home": "Главная",
+    "applications": "Заявки",
+    "myCampaignsTab": "Мои кампании",
+    "chat": "Чат",
+    "profile": "Профиль"
+  },
+  "home": {
+    "title": "Кампании",
+    "empty": "Пока нет открытых кампаний",
+    "budget": "Бюджет",
+    "deadline": "Срок",
+    "apply": "Подать заявку",
+    "loadMore": "Показать ещё"
+  },
+  "onboarding": {
+    "welcome": "Добро пожаловать в InfluenceX",
+    "chooseRole": "Кто вы?",
+    "creator": "Я креатор",
+    "business": "Я бизнес",
+    "continue": "Продолжить"
+  },
+  "profile": {
+    "editProfile": "Редактировать профиль",
+    "followers": "Подписчики",
+    "rating": "Рейтинг",
+    "creatorScore": "Creator Score",
+    "businessScore": "Business Score",
+    "verification": "Верификация",
+    "payoutTitle": "Реквизиты для выплат",
+    "payoutHint": "InfluenceX выплачивает вознаграждение за сотрудничество по этим реквизитам",
+    "payoutAccountPlaceholder": "Номер карты или счёта",
+    "choosePhoto": "Выбрать фото",
+    "changePhoto": "Изменить фото",
+    "uploading": "Загрузка...",
+    "verificationHint": "Загрузите документ для верификации профиля (необязательно) - модератор рассмотрит.",
+    "requestVerification": "Запросить верификацию",
+    "verificationStatus": {
+      "unverified": "Не подтверждено",
+      "pending": "На рассмотрении",
+      "verified": "Подтверждено",
+      "rejected": "Отклонено"
+    },
+    "aiPriceTitle": "Рекомендуемая AI цена",
+    "nameMissing": "Имя не указано — нажмите, чтобы заполнить",
+    "nameRequired": "Введите имя",
+    "companyNameRequired": "Введите название компании",
+    "nameField": "Имя",
+    "countryField": "Страна",
+    "cityField": "Город",
+    "languagesField": "Языки (язык контента)",
+    "categoriesField": "Категории (через запятую, напр.: красота, путешествия)",
+    "socialLinksField": "Ссылки на соцсети",
+    "avgViewsField": "Среднее число просмотров",
+    "engagementRateField": "Вовлечённость (%)",
+    "companyNameField": "Название компании",
+    "descriptionFieldBiz": "Описание компании",
+    "industryField": "Сфера деятельности",
+    "websiteField": "Веб-сайт",
+    "contactPersonField": "Контактное лицо"
+  },
+  "ratings": {
+    "rateTitle": "Оцените сотрудничество",
+    "rateHint": "После завершения работы оцените другую сторону - это формирует репутацию (Creator Score / Business Score).",
+    "commentPlaceholder": "Комментарий (необязательно)",
+    "submit": "Оставить оценку",
+    "submitted": "Спасибо! Ваша оценка принята.",
+    "alreadyRated": "Вы уже оценили это сотрудничество"
+  },
+  "escrow": {
+    "awaiting_deposit": "Ожидается оплата",
+    "held": "Принято, выплата готовится",
+    "release_pending": "Выплата в процессе",
+    "released": "Оплачено",
+    "refunded": "Возвращено",
+    "disputed": "Спор"
+  },
+  "common": {
+    "loading": "Загрузка...",
+    "error": "Произошла ошибка",
+    "save": "Сохранить",
+    "cancel": "Отмена",
+    "send": "Отправить",
+    "delete": "Удалить"
+  },
+  "createCampaign": {
+    "title": "Создать кампанию",
+    "aiTitle": "AI-генератор брифа",
+    "aiHint": "Опишите ваш продукт/услугу — AI автоматически подготовит бриф кампании",
+    "productPlaceholder": "Например: кофейня в Ташкенте, новое осеннее меню...",
+    "generateBrief": "Создать бриф с AI",
+    "titleField": "Название кампании",
+    "descriptionField": "Описание",
+    "objectiveField": "Цель",
+    "creatorsCount": "Количество креаторов",
+    "submit": "Сохранить кампанию",
+    "barterHint": "В модели Barter вы передаёте креатору не деньги, а товар/услугу (например, блюдо в ресторане). Через InfluenceX наличными оплачивается только комиссия (10%) - сам товар передаётся креатору напрямую.",
+    "cpaHint": "В модели CPA/Hybrid вы платите за каждую реальную конверсию (продажа, лид). Ссылка отслеживания направляет трафик креатора.",
+    "cpaRateField": "Сумма за конверсию (UZS)",
+    "landingUrlField": "Ссылка на лендинг (https://...)",
+    "pureCpaWarning": "Внимание: в чистой модели CPA оплата зависит от числа конверсий, и обычно это число указываете вы сами - это создаёт риск несправедливости по отношению к креатору (например, занижение числа). Если вы не можете подключить автоматическое подтверждение (webhook или Telegram-бот), рекомендуется Hybrid - креатор получает гарантированную базовую оплату плюс бонус CPA.",
+    "switchToHybrid": "Переключиться на Hybrid"
+  },
+  "products": {
+    "title": "Каталог товаров",
+    "hint": "Добавьте товар/услугу и включите \"видно креаторам\" - автоматически превращается в CPA-кампанию, креаторы увидят её в ленте и смогут рекламировать.",
+    "addNew": "Добавить товар",
+    "empty": "Пока нет добавленных товаров",
+    "nameField": "Название товара",
+    "descriptionField": "Описание (необязательно)",
+    "priceField": "Цена (UZS)",
+    "cpaRateField": "Выплата креатору за продажу (UZS)",
+    "externalUrlField": "Ссылка на страницу продажи (Uzum/Instagram/ваш сайт)",
+    "externalUrlHint": "InfluenceX не проводит checkout здесь - только направляет креатора на эту страницу. Реальную продажу вы фиксируете сами или через webhook.",
+    "create": "Добавить товар",
+    "visible": "Видно креаторам",
+    "hidden": "Скрыто",
+    "makeVisible": "Показать креаторам",
+    "makeHidden": "Скрыть",
+    "deleteConfirm": "Удалить этот товар?"
+  },
+  "applicants": {
+    "title": "Заявки",
+    "backToCampaign": "Вернуться к кампании",
+    "viewApplicants": "Смотреть заявки",
+    "empty": "Пока нет заявок",
+    "followers": "подписчиков",
+    "rating": "Рейтинг",
+    "proposedPrice": "Предложенная цена",
+    "accept": "Принять",
+    "reject": "Отклонить",
+    "status": {
+      "pending": "На рассмотрении",
+      "accepted": "Принято",
+      "rejected": "Отклонено",
+      "withdrawn": "Отозвано"
+    },
+    "aiPrice": "Рекомендация AI по цене",
+    "recommendedTitle": "Другие подходящие креаторы (AI)",
+    "startPayment": "Начать оплату",
+    "openCheckoutAgain": "Открыть страницу оплаты снова",
+    "approveAndRelease": "Подтвердить и выплатить",
+    "waitingForContent": "Креатор ещё не отправил контент - подождите перед выплатой",
+    "refund": "Отменить (вернуть средства)",
+    "refundConfirm": "Вы уверены, что хотите отменить этот escrow и вернуть средства?"
+  },
+  "chat": {
+    "attach": "Прикрепить файл",
+    "attachment": "📎 Вложение"
+  },
+  "dispute": {
+    "title": "Открыть спор",
+    "reasonPlaceholder": "Опишите, что произошло...",
+    "reasonTooShort": "Опишите причину подробнее (минимум 5 символов)",
+    "addEvidence": "Прикрепить доказательство (фото/видео)",
+    "filesAttached": "файл(ов) прикреплено",
+    "submit": "Отправить спор",
+    "raise": "Открыть спор",
+    "submitted": "Спор отправлен. Модератор скоро рассмотрит."
+  },
+  "applications": {
+    "submitContent": "Отправить контент",
+    "contentUrlPlaceholder": "Ссылка на пост (Instagram/TikTok/YouTube)",
+    "contentUrlRequired": "Укажите ссылку или загрузите файл",
+    "uploadInstead": "или загрузить файл",
+    "contentNotePlaceholder": "Комментарий (необязательно)",
+    "sendContent": "Отправить",
+    "contentSubmittedOn": "Контент отправлен:"
+  },
+  "conversions": {
+    "title": "Конверсии (CPA)",
+    "empty": "Конверсии пока не зафиксированы",
+    "confirmedTotal": "Подтверждено всего",
+    "payout": "Выплата партнёру",
+    "paid": "оплачено",
+    "confirm": "Подтвердить",
+    "reject": "Отклонить",
+    "report": "Зафиксировать конверсию",
+    "submit": "Отправить",
+    "amountField": "Сумма (UZS)",
+    "trackingRefField": "ID заказа/транзакции (необязательно)",
+    "type": {
+      "sale": "Продажа",
+      "lead": "Лид",
+      "registration": "Регистрация",
+      "subscription": "Подписка"
+    },
+    "status": {
+      "pending": "Ожидает",
+      "confirmed": "Подтверждено",
+      "rejected": "Отклонено"
+    }
+  },
+  "portfolio": {
+    "title": "Портфолио",
+    "hint": "Добавьте примеры прошлых работ - бизнес увидит их при рассмотрении вашей заявки.",
+    "manageLink": "Управление портфолио",
+    "addItem": "Добавить пример",
+    "captionPlaceholder": "Подпись (необязательно)",
+    "empty": "Портфолио пока пусто",
+    "deleteConfirm": "Удалить этот пример?"
+  },
+  "earnings": {
+    "title": "Доходы",
+    "totalEarned": "Всего заработано",
+    "pending": "Ожидается",
+    "history": "История",
+    "empty": "Транзакций пока нет",
+    "typeEscrow": "Оплата кампании",
+    "typeConversion": "CPA конверсия"
+  },
+  "payments": {
+    "title": "Платежи",
+    "totalSpent": "Всего потрачено",
+    "pending": "Ожидается",
+    "history": "История",
+    "empty": "Транзакций пока нет"
+  },
+  "analytics": {
+    "title": "Аналитика",
+    "applicationsFunnel": "Воронка заявок",
+    "total": "Всего",
+    "acceptanceRate": "Процент принятия",
+    "campaignsCompleted": "Завершённые кампании",
+    "cpaPerformance": "Показатели CPA",
+    "clicks": "Клики",
+    "conversions": "Конверсии",
+    "conversionRate": "Конверсия",
+    "campaignsByStatus": "Кампании по статусу",
+    "topCreators": "Надёжные креаторы",
+    "acceptedCampaigns": "принято"
+  },
+  "myCampaigns": {
+    "title": "Мои кампании",
+    "empty": "Вы ещё не создали кампанию.",
+    "applicants": "Заявки",
+    "featuredUntil": "Featured (до:",
+    "featured": "Featured (продвигается)",
+    "cancel": "Отменить",
+    "cancelConfirm": "Отменить эту кампанию?",
+    "feature": "Продвинуть (7 дней)",
+    "advanceTo": {
+      "published": "Опубликовать",
+      "in_progress": "Начать",
+      "completed": "Завершить"
+    }
+  },
+  "featured": {
+    "creatorTitle": "Продвижение профиля",
+    "creatorHint": "Ваш профиль будет более заметен для бизнеса и выше в AI-рекомендациях.",
+    "promoteProfile": "Продвинуть на 7 дней",
+    "activeUntil": "Продвигается, до:"
+  },
+  "subscription": {
+    "title": "Тарифный план",
+    "hint": "Тариф определяет, сколько активных (опубликованных) кампаний можно вести одновременно.",
+    "unlimited": "неограниченно",
+    "campaignsSuffix": "активных кампаний",
+    "plan": {
+      "starter": "Starter",
+      "growth": "Growth",
+      "pro": "Pro"
+    }
+  }
+}
