@@ -2,8 +2,10 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { apiClient } from '../api/client';
 import type { ConversionDto } from '@influencex/shared';
-import { ConversionStatus, ConversionType } from '@influencex/shared';
-
+import {
+  ConversionStatus,
+  ConversionType,
+} from '@influencex/shared';
 interface ConversionsPanelProps {
   applicationId: string;
   currency: string;

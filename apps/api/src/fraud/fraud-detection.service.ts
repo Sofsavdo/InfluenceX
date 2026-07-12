@@ -2,6 +2,16 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreatorTier } from '@influencex/shared';
 
+interface CreatorProfileRow {
+  id: string;
+  userId: string;
+  name: string;
+  followers: number;
+  avgViews: number;
+  engagementRate: number;
+  tier: CreatorTier;
+  verificationStatus: string;
+}
 export interface FraudSignal {
   code: string;
   label: string;
@@ -38,7 +48,7 @@ const HIGH_ENGAGEMENT_THRESHOLD: Record<CreatorTier, number> = {
  * Suspicious traffic, Artificial activity. MVP'da bu tashqi ma'lumot (masalan
  * Instagram/TikTok API orqali haqiqiy auditoriya tahlili) talab qilmaydigan,
  * faqat InfluenceX o'z ma'lumotlar bazasidagi profil ko'rsatkichlariga asoslangan
- * evristika (heuristic) - moderatorlarga QAERGA e'tibor qaratish kerakligini
+ * evristika (heuristic) - moderatorlarga QAYERGA e'tibor qaratish kerakligini
  * ko'rsatuvchi signal, YAKUNIY qaror emas (moderator profilni qo'lda tekshiradi).
  */
 @Injectable()
@@ -46,7 +56,8 @@ export class FraudDetectionService {
   constructor(private readonly prisma: PrismaService) {}
 
   async generateReport(limit = 100): Promise<FraudReportEntry[]> {
-    const creators = await this.prisma.creatorProfile.findMany({ take: 1000 });
+    const creators: CreatorProfileRow[] =
+  await this.prisma.creatorProfile.findMany({ take: 1000 });
     const scored = creators
       .map((creator) => this.evaluate(creator))
       .filter((entry) => entry.suspicionScore > 0)
@@ -54,7 +65,7 @@ export class FraudDetectionService {
     return scored.slice(0, limit);
   }
 
-  evaluate(creator: any): FraudReportEntry {
+  evaluate(creator: CreatorProfileRow): FraudReportEntry {
     const signals: FraudSignal[] = [];
     const tier = creator.tier as CreatorTier;
 

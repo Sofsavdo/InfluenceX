@@ -314,7 +314,7 @@ describe('EscrowService', () => {
       const result = await service.handleClickPrepare(dto as any);
 
       expect(result.error).toBe(0);
-      expect(result.merchant_prepare_id).toBe(42);
+      expect((result as any).merchant_prepare_id).toBe(42);
       expect(prisma.clickTransaction.create).toHaveBeenCalledTimes(1);
     });
 
@@ -325,7 +325,7 @@ describe('EscrowService', () => {
 
       const result = await service.handleClickPrepare(dto as any);
 
-      expect(result.merchant_prepare_id).toBe(42);
+      expect((result as any).merchant_prepare_id).toBe(42);
       expect(prisma.clickTransaction.create).not.toHaveBeenCalled();
     });
 
@@ -418,7 +418,7 @@ describe('EscrowService', () => {
         expect.objectContaining({ where: { id: ESCROW_ID }, data: { status: EscrowStatus.HELD } }),
       );
       expect(result.error).toBe(0);
-      expect(result.merchant_confirm_id).toBe(42);
+      expect((result as any).merchant_confirm_id).toBe(42);
     });
 
     it('replay himoyasi: sign_time kelajakda bo\'lsa (soat farqi/qalbakilashtirish) ham error -1 qaytaradi', async () => {

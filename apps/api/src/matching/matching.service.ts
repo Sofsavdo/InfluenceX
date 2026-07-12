@@ -1,7 +1,21 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Platform } from '@influencex/shared';
-
+interface CreatorProfileRow {
+  id: string;
+  userId: string;
+  name: string;
+  avatarUrl: string | null;
+  followers: number;
+  engagementRate: number;
+  tier: string;
+  country: string | null;
+  categories: string[];
+  languages: string[];
+  socialLinks: Record<string, unknown> | null;
+  creatorScore: number;
+  rating: number;
+}
 export interface CreatorRequirement {
   minFollowers?: number;
   maxFollowers?: number;
@@ -73,7 +87,8 @@ export class MatchingService {
 
     // Dastlabki keng filtr (DB darajasida) - faqat verifikatsiyadan o'tgan/faol
     // kreatorlarni ko'rib chiqamiz, so'ng nozik skorlashni JS'da qilamiz.
-    const candidates = await this.prisma.creatorProfile.findMany({
+    const candidates: CreatorProfileRow[] =
+  await this.prisma.creatorProfile.findMany({
       where: {
         ...(requirements.minFollowers ? { followers: { gte: requirements.minFollowers } } : {}),
         ...(requirements.maxFollowers ? { followers: { lte: requirements.maxFollowers } } : {}),
@@ -86,7 +101,10 @@ export class MatchingService {
     return scored.slice(0, limit);
   }
 
-  private score(creator: any, requirements: CreatorRequirement): CreatorMatch {
+  private score(
+  creator: CreatorProfileRow,
+  requirements: CreatorRequirement,
+): CreatorMatch {
     const breakdown: Record<string, number> = {};
 
     breakdown.category = overlapRatio(requirements.categories ?? [], creator.categories ?? []);

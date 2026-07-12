@@ -68,8 +68,8 @@ export class TelegramAuthGuard implements CanActivate {
   }
 
   private mapLanguage(code?: string): Language {
-    if (code === 'ru') return Language.ru;
-    if (code === 'en') return Language.en;
-    return Language.uz;
+    if (code === 'ru') return Language.RU;
+    if (code === 'en') return Language.EN;
+    return Language.UZ;
   }
 }

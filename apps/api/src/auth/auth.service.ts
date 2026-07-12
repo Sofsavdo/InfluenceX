@@ -67,8 +67,8 @@ export class AuthService {
   }
 
   private mapLanguage(code?: string): Language {
-    if (code === 'ru') return Language.ru;
-    if (code === 'en') return Language.en;
-    return Language.uz; // standart — O'zbek bozori ustuvor
+    if (code === 'ru') return Language.RU;
+    if (code === 'en') return Language.EN;
+    return Language.UZ; // standart — O'zbek bozori ustuvor
   }
 }

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { apiClient } from '../api/client';
-import { UserRole } from '@influencex/shared';
+type UserRole = 'CREATOR' | 'BUSINESS' | 'ADMIN' | 'MODERATOR';
 
 interface MeRoleResponse {
   role: UserRole;
@@ -29,7 +29,7 @@ export function BottomNav() {
       .catch(() => setRole(null));
   }, []);
 
-  const isBusiness = role === UserRole.BUSINESS;
+  const isBusiness = role === 'BUSINESS';
 
   const tabs = [
     { to: '/', key: 'home', icon: '🏠' },

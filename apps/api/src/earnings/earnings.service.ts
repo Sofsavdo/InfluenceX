@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { EscrowStatus, ConversionStatus } from '@influencex/shared';
 
-interface TransactionRow {
+export interface TransactionRow {
   type: 'escrow' | 'conversion';
   campaignTitle: string;
   amount: number;
