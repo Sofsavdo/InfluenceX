@@ -50,7 +50,7 @@ export class CampaignsService {
         currency: dto.currency ?? 'UZS',
         creatorsCount: dto.creatorsCount,
         deadline: new Date(dto.deadline),
-        requirements: dto.requirements ?? {},
+        requirements: (dto.requirements ?? {}) as any,
         status: CampaignStatus.DRAFT,
         cpaRate: dto.cpaRate,
         landingUrl: dto.landingUrl,
@@ -72,7 +72,7 @@ export class CampaignsService {
       throw new NotFoundException('Kampaniya topilmadi yoki sizga tegishli emas');
     }
 
-    const becomingActive = ACTIVE_STATUSES.includes(dto.status) && !ACTIVE_STATUSES.includes(campaign.status);
+    const becomingActive = ACTIVE_STATUSES.includes(dto.status) && !ACTIVE_STATUSES.includes(campaign.status as any);
     if (becomingActive) {
       const limit = SUBSCRIPTION_PLAN_LIMITS[business.subscriptionPlan as SubscriptionPlan];
       if (limit !== null) {

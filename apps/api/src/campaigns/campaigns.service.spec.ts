@@ -135,8 +135,8 @@ describe('CampaignsService', () => {
       const result = await service.feature(USER_ID, CAMPAIGN_ID, 7);
 
       expect(result.isFeatured).toBe(true);
-      expect(result.featuredUntil.getTime()).toBeGreaterThan(before);
-      expect(result.featuredUntil.getTime()).toBeLessThanOrEqual(before + 7 * 24 * 60 * 60 * 1000 + 1000);
+      expect(result.featuredUntil!.getTime()).toBeGreaterThan(before);
+      expect(result.featuredUntil!.getTime()).toBeLessThanOrEqual(before + 7 * 24 * 60 * 60 * 1000 + 1000);
     });
   });
 

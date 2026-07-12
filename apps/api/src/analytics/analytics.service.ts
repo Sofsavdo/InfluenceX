@@ -39,7 +39,7 @@ export class AnalyticsService {
       };
     }
 
-    const [applications, completedEscrowsCount, conversions]: [ApplicationRow[], number, ConversionRow[]] =
+    const [applications, completedEscrowsCount, conversions]: [any, number, any] =
       await Promise.all([
         this.prisma.campaignApplication.findMany({
           where: { creatorId: creator.id },
@@ -99,9 +99,9 @@ export class AnalyticsService {
     }
 
     const [campaigns, applications, conversions]: [
-      { status: CampaignStatus }[],
-      BusinessApplicationRow[],
-      ConversionRow[],
+      any,
+      any,
+      any,
     ] = await Promise.all([
       this.prisma.campaign.findMany({ where: { businessId: business.id }, select: { status: true } }),
       this.prisma.campaignApplication.findMany({

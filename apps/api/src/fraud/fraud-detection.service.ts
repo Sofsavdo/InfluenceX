@@ -56,8 +56,8 @@ export class FraudDetectionService {
   constructor(private readonly prisma: PrismaService) {}
 
   async generateReport(limit = 100): Promise<FraudReportEntry[]> {
-    const creators: CreatorProfileRow[] =
-  await this.prisma.creatorProfile.findMany({ take: 1000 });
+    const creators: any[] =
+      await this.prisma.creatorProfile.findMany({ take: 1000 });
     const scored = creators
       .map((creator) => this.evaluate(creator))
       .filter((entry) => entry.suspicionScore > 0)

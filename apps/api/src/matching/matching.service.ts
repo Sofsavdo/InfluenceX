@@ -87,8 +87,8 @@ export class MatchingService {
 
     // Dastlabki keng filtr (DB darajasida) - faqat verifikatsiyadan o'tgan/faol
     // kreatorlarni ko'rib chiqamiz, so'ng nozik skorlashni JS'da qilamiz.
-    const candidates: CreatorProfileRow[] =
-  await this.prisma.creatorProfile.findMany({
+    const candidates: any[] =
+      await this.prisma.creatorProfile.findMany({
       where: {
         ...(requirements.minFollowers ? { followers: { gte: requirements.minFollowers } } : {}),
         ...(requirements.maxFollowers ? { followers: { lte: requirements.maxFollowers } } : {}),
