@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { Home, ClipboardList, MessageCircle, User } from 'lucide-react';
 import { apiClient } from '../api/client';
+
 type UserRole = 'CREATOR' | 'BUSINESS' | 'ADMIN' | 'MODERATOR';
 
 interface MeRoleResponse {
@@ -18,6 +20,7 @@ interface MeRoleResponse {
 // "Mening kampaniyalarim" Profile.tsx orqaligina yetib borish mumkin bo'lgan alohida
 // sahifa edi). Endi rol aniqlanadi va biznes uchun bu tab to'g'ridan-to'g'ri
 // /campaigns/mine'ga olib boradi.
+// 2026-07-14: dizayn tizimi - lucide ikonkalari, faol holat uchun accent rang + tepada chiziq.
 export function BottomNav() {
   const { t } = useTranslation();
   const [role, setRole] = useState<UserRole | null>(null);
@@ -32,26 +35,34 @@ export function BottomNav() {
   const isBusiness = role === 'BUSINESS';
 
   const tabs = [
-    { to: '/', key: 'home', icon: '🏠' },
+    { to: '/', key: 'home', Icon: Home },
     isBusiness
-      ? { to: '/campaigns/mine', key: 'myCampaignsTab', icon: '📋' }
-      : { to: '/applications', key: 'applications', icon: '📋' },
-    { to: '/chat', key: 'chat', icon: '💬' },
-    { to: '/profile', key: 'profile', icon: '👤' },
+      ? { to: '/campaigns/mine', key: 'myCampaignsTab', Icon: ClipboardList }
+      : { to: '/applications', key: 'applications', Icon: ClipboardList },
+    { to: '/chat', key: 'chat', Icon: MessageCircle },
+    { to: '/profile', key: 'profile', Icon: User },
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 flex justify-around border-t border-tg-secondaryBg bg-tg-bg py-2">
+    <nav className="fixed bottom-0 left-0 right-0 flex justify-around border-t border-ink-100 bg-white/95 backdrop-blur pb-[env(safe-area-inset-bottom)] pt-1.5 z-10">
       {tabs.map((tab) => (
         <NavLink
           key={tab.to}
           to={tab.to}
+          end={tab.to === '/'}
           className={({ isActive }) =>
-            `flex flex-col items-center text-xs ${isActive ? 'text-tg-link font-semibold' : 'text-tg-hint'}`
+            `tap-scale relative flex flex-col items-center gap-0.5 px-4 py-1.5 text-[11px] font-medium ${
+              isActive ? 'text-accent-600' : 'text-ink-400'
+            }`
           }
         >
-          <span className="text-lg">{tab.icon}</span>
-          {t(`nav.${tab.key}`)}
+          {({ isActive }) => (
+            <>
+              {isActive && <span className="absolute -top-1.5 h-0.5 w-6 rounded-full bg-accent-500" />}
+              <tab.Icon size={21} strokeWidth={isActive ? 2.4 : 2} />
+              {t(`nav.${tab.key}`)}
+            </>
+          )}
         </NavLink>
       ))}
     </nav>

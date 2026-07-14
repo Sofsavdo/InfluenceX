@@ -1,12 +1,19 @@
 import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { CheckCircle2, Sparkles, Users } from 'lucide-react';
 import { apiClient } from '../api/client';
 import { DisputeForm } from '../components/DisputeForm';
 import { ConversionsPanel } from '../components/ConversionsPanel';
 import { RatingForm } from '../components/RatingForm';
 import type { ApplicationDto, CreatorProfileDto, CampaignDto, EscrowDto } from '@influencex/shared';
 import { ApplicationStatus, CollaborationModel, EscrowStatus, PaymentProvider } from '@influencex/shared';
+import { PageHeader } from '../components/ui/PageHeader';
+import { Card } from '../components/ui/Card';
+import { Button } from '../components/ui/Button';
+import { Badge } from '../components/ui/Badge';
+import { CardSkeleton } from '../components/ui/Skeleton';
+import { EmptyState } from '../components/ui/EmptyState';
 
 type ApplicationWithCreator = ApplicationDto & { creator: CreatorProfileDto; escrow?: EscrowDto | null };
 
@@ -39,6 +46,7 @@ interface DepositIntentResult {
 // zayavkalarni ko'rib chiqadi, qabul/rad qiladi, TO'LOVNI BOSHLAYDI, ISHNI TASDIQLAYDI
 // (2026-07-11 - avval bu to'liq to'lov oqimi UI'da umuman yo'q edi, faqat backend API bor edi).
 // AI Pricing Engine va AI Creator Matching ham shu ekranga ulangan.
+// 2026-07-14: dizayn tizimi qo'llanildi - mantiq/API chaqiruvlari o'zgarmagan.
 export default function CampaignApplicants() {
   const { id } = useParams();
   const { t } = useTranslation();
@@ -169,45 +177,50 @@ export default function CampaignApplicants() {
   const appliedCreatorIds = new Set(applications.map((a) => a.creator.id));
 
   return (
-    <div className="p-4 pb-20">
-      <h1 className="text-xl font-bold mb-1">{t('applicants.title')}</h1>
-      <Link to={`/campaigns/${id}`} className="text-tg-link text-sm">
-        ← {t('applicants.backToCampaign')}
-      </Link>
+    <div className="p-4 pb-24">
+      <PageHeader back title={t('applicants.title')} />
 
-      {error && <p className="text-red-600 text-sm mt-3">{error}</p>}
-      {loading && <p className="text-tg-hint mt-4">{t('common.loading')}</p>}
-      {!loading && applications.length === 0 && (
-        <p className="text-tg-hint mt-4">{t('applicants.empty')}</p>
+      {error && <p className="text-danger-text text-sm mb-3">{error}</p>}
+
+      {loading && (
+        <>
+          <CardSkeleton />
+          <CardSkeleton />
+        </>
       )}
 
-      <div className="mt-4 space-y-3">
+      {!loading && applications.length === 0 && (
+        <EmptyState icon={<Users size={24} />} title={t('applicants.empty')} />
+      )}
+
+      <div className="space-y-3">
         {applications.map((app) => {
           const rec = pricing[app.creator.id];
           const escrow = app.escrow;
           return (
-            <div key={app.id} className="rounded-xl border border-tg-secondaryBg p-4">
-              <div className="flex justify-between items-start">
+            <Card key={app.id}>
+              <div className="flex justify-between items-start gap-2">
                 <div>
-                  <p className="font-semibold">{app.creator.name}</p>
-                  <p className="text-xs text-tg-hint">
+                  <p className="font-semibold text-ink-900 text-[15px]">{app.creator.name}</p>
+                  <p className="text-xs text-ink-400 mt-0.5">
                     {app.creator.followers.toLocaleString()} {t('applicants.followers')} ·{' '}
                     {t('applicants.rating')}: {app.creator.rating.toFixed(1)} · {app.creator.tier}
                   </p>
                 </div>
-                <span className="text-xs rounded-full bg-tg-secondaryBg px-2 py-1 shrink-0">
+                <Badge tone="neutral" className="shrink-0">
                   {t(`applicants.status.${app.status.toLowerCase()}`)}
-                </span>
+                </Badge>
               </div>
 
-              {app.message && <p className="text-sm mt-2">{app.message}</p>}
+              {app.message && <p className="text-sm text-ink-700 mt-2">{app.message}</p>}
               {app.proposedPrice != null && (
-                <p className="text-sm mt-1 text-tg-hint">
-                  {t('applicants.proposedPrice')}: <span className="font-medium">{app.proposedPrice.toLocaleString()}</span>
+                <p className="text-sm mt-1 text-ink-400">
+                  {t('applicants.proposedPrice')}:{' '}
+                  <span className="font-medium text-ink-800">{app.proposedPrice.toLocaleString()}</span>
                 </p>
               )}
               {rec && (
-                <p className="text-xs mt-1 text-tg-hint">
+                <p className="text-xs mt-1 text-ink-400">
                   {t('applicants.aiPrice')}: {rec.min.toLocaleString()} - {rec.max.toLocaleString()} {rec.currency}
                 </p>
               )}
@@ -219,7 +232,7 @@ export default function CampaignApplicants() {
                       key={i}
                       src={p.mediaUrl}
                       alt=""
-                      className="w-14 h-14 rounded-lg object-cover border border-tg-secondaryBg"
+                      className="w-14 h-14 rounded-lg object-cover border border-ink-100"
                     />
                   ))}
                 </div>
@@ -227,46 +240,40 @@ export default function CampaignApplicants() {
 
               {app.status === ApplicationStatus.PENDING && (
                 <div className="flex gap-2 mt-3">
-                  <button
-                    onClick={() => act(app.id, ApplicationStatus.ACCEPTED)}
-                    disabled={actingId === app.id}
-                    className="flex-1 rounded-lg bg-tg-button text-tg-buttonText py-2 text-sm font-semibold disabled:opacity-50"
-                  >
+                  <Button size="sm" full loading={actingId === app.id} onClick={() => act(app.id, ApplicationStatus.ACCEPTED)}>
                     {t('applicants.accept')}
-                  </button>
-                  <button
-                    onClick={() => act(app.id, ApplicationStatus.REJECTED)}
+                  </Button>
+                  <Button
+                    size="sm"
+                    full
+                    variant="secondary"
                     disabled={actingId === app.id}
-                    className="flex-1 rounded-lg border border-tg-secondaryBg py-2 text-sm font-semibold disabled:opacity-50"
+                    onClick={() => act(app.id, ApplicationStatus.REJECTED)}
                   >
                     {t('applicants.reject')}
-                  </button>
+                  </Button>
                 </div>
               )}
 
               {/* To'lov oqimi - faqat ACCEPTED bo'lganda escrow mavjud bo'ladi */}
               {escrow && (
-                <div className="mt-3 rounded-lg bg-tg-secondaryBg/40 p-3">
+                <div className="mt-3 rounded-xl border border-ink-100 bg-ink-50 p-3">
                   <div className="flex justify-between text-sm mb-2">
-                    <span className="text-tg-hint">Escrow</span>
-                    <span className="font-medium">{t(`escrow.${escrow.status.toLowerCase()}`)}</span>
+                    <span className="text-ink-400">Escrow</span>
+                    <span className="font-medium text-ink-800">{t(`escrow.${escrow.status.toLowerCase()}`)}</span>
                   </div>
 
                   {escrow.status === EscrowStatus.AWAITING_DEPOSIT && (
                     <>
-                      <button
-                        onClick={() => initiateDeposit(escrow.id)}
-                        disabled={actingId === escrow.id}
-                        className="w-full rounded-lg bg-tg-button text-tg-buttonText py-2 text-sm font-semibold disabled:opacity-50"
-                      >
+                      <Button size="sm" full loading={actingId === escrow.id} onClick={() => initiateDeposit(escrow.id)}>
                         {t('applicants.startPayment')}
-                      </button>
+                      </Button>
                       {depositCheckoutUrls[escrow.id] && (
                         <a
                           href={depositCheckoutUrls[escrow.id]}
                           target="_blank"
                           rel="noreferrer"
-                          className="block text-center text-tg-link text-xs mt-2"
+                          className="block text-center text-accent-600 text-xs mt-2"
                         >
                           {t('applicants.openCheckoutAgain')}
                         </a>
@@ -278,8 +285,9 @@ export default function CampaignApplicants() {
                     <>
                       {app.contentSubmittedAt ? (
                         <>
-                          <p className="text-xs text-tg-hint mb-2">
-                            ✓ {t('applications.contentSubmittedOn')} {new Date(app.contentSubmittedAt).toLocaleDateString()}
+                          <p className="text-xs text-ink-400 mb-2 flex items-center gap-1.5">
+                            <CheckCircle2 size={13} className="text-success-dot" />
+                            {t('applications.contentSubmittedOn')} {new Date(app.contentSubmittedAt).toLocaleDateString()}
                           </p>
                           {app.contentUrls?.map((url) => (
                             <a
@@ -287,39 +295,38 @@ export default function CampaignApplicants() {
                               href={url}
                               target="_blank"
                               rel="noreferrer"
-                              className="block text-tg-link text-xs truncate mb-2"
+                              className="block text-accent-600 text-xs truncate mb-2"
                             >
                               {url}
                             </a>
                           ))}
-                          <button
-                            onClick={() => release(escrow.id)}
-                            disabled={actingId === escrow.id}
-                            className="w-full rounded-lg bg-green-600 text-white py-2 text-sm font-semibold disabled:opacity-50"
-                          >
+                          <Button size="sm" full loading={actingId === escrow.id} onClick={() => release(escrow.id)}>
                             {t('applicants.approveAndRelease')}
-                          </button>
+                          </Button>
                         </>
                       ) : (
-                        <p className="text-xs text-tg-hint">{t('applicants.waitingForContent')}</p>
+                        <p className="text-xs text-ink-400">{t('applicants.waitingForContent')}</p>
                       )}
                     </>
                   )}
 
                   {[EscrowStatus.AWAITING_DEPOSIT, EscrowStatus.HELD].includes(escrow.status) && (
-                    <button
+                    <Button
+                      size="sm"
+                      full
+                      variant="secondary"
+                      className="mt-2"
+                      loading={actingId === escrow.id}
                       onClick={() => refund(escrow.id)}
-                      disabled={actingId === escrow.id}
-                      className="w-full rounded-lg border border-tg-secondaryBg py-2 text-sm mt-2 disabled:opacity-50"
                     >
                       {t('applicants.refund')}
-                    </button>
+                    </Button>
                   )}
 
                   {[EscrowStatus.HELD, EscrowStatus.RELEASE_PENDING].includes(escrow.status) && (
                     <button
                       onClick={() => setDisputeForEscrowId(disputeForEscrowId === escrow.id ? null : escrow.id)}
-                      className="w-full text-red-600 text-xs mt-2"
+                      className="tap-scale w-full text-danger-text text-xs mt-2 font-medium"
                     >
                       {t('dispute.raise')}
                     </button>
@@ -351,33 +358,33 @@ export default function CampaignApplicants() {
                   campaign.collaborationModel === CollaborationModel.HYBRID) && (
                   <ConversionsPanel applicationId={app.id} currency={campaign.currency} isBusiness />
                 )}
-            </div>
+            </Card>
           );
         })}
       </div>
 
       {!loading && recommended.filter((m) => !appliedCreatorIds.has(m.creator.id)).length > 0 && (
         <div className="mt-6">
-          <h2 className="text-sm font-semibold text-tg-hint mb-2">{t('applicants.recommendedTitle')}</h2>
+          <h2 className="text-xs font-semibold uppercase tracking-wide text-ink-400 mb-2 flex items-center gap-1.5">
+            <Sparkles size={13} className="text-accent-500" />
+            {t('applicants.recommendedTitle')}
+          </h2>
           <div className="space-y-2">
             {recommended
               .filter((m) => !appliedCreatorIds.has(m.creator.id))
               .map((m) => (
-                <div
-                  key={m.creator.id}
-                  className="rounded-xl border border-tg-secondaryBg p-3 flex justify-between items-center"
-                >
+                <Card key={m.creator.id} className="flex justify-between items-center">
                   <div>
-                    <p className="font-medium text-sm">{m.creator.name}</p>
-                    <p className="text-xs text-tg-hint">
+                    <p className="font-medium text-sm text-ink-900">{m.creator.name}</p>
+                    <p className="text-xs text-ink-400 mt-0.5">
                       {m.creator.followers.toLocaleString()} {t('applicants.followers')} · {m.creator.tier}
                       {m.creator.country ? ` · ${m.creator.country}` : ''}
                     </p>
                   </div>
-                  <span className="text-xs rounded-full bg-tg-button text-tg-buttonText px-2 py-1 shrink-0">
+                  <Badge tone="info" className="shrink-0">
                     {m.score}%
-                  </span>
-                </div>
+                  </Badge>
+                </Card>
               ))}
           </div>
         </div>

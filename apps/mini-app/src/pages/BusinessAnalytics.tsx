@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
 import { apiClient } from '../api/client';
+import { PageHeader } from '../components/ui/PageHeader';
+import { Card } from '../components/ui/Card';
+import { CardSkeleton } from '../components/ui/Skeleton';
 
 interface BusinessAnalyticsData {
   campaignsByStatus: Record<string, number>;
@@ -10,8 +12,18 @@ interface BusinessAnalyticsData {
   cpa: { totalClicks: number; totalConversions: number; confirmedConversions: number; conversionRate: number };
 }
 
+function MiniStat({ label, value }: { label: string; value: React.ReactNode }) {
+  return (
+    <div className="rounded-xl border border-ink-100 bg-white p-2.5 text-center shadow-card">
+      <div className="text-lg font-extrabold text-ink-900">{value}</div>
+      <div className="text-[10px] text-ink-400 mt-0.5">{label}</div>
+    </div>
+  );
+}
+
 // PRD Business Dashboard "Analytics" - kampaniyalar holati bo'yicha taqsimot, zayavkalar
 // qabul qilinish darajasi, eng ishonchli hamkor kreatorlar va CPA konversiya darajasi.
+// 2026-07-14: dizayn tizimi qo'llanildi - mantiq/API chaqiruvlari o'zgarmagan.
 export default function BusinessAnalytics() {
   const { t } = useTranslation();
   const [data, setData] = useState<BusinessAnalyticsData | null>(null);
@@ -25,61 +37,54 @@ export default function BusinessAnalytics() {
   }, []);
 
   return (
-    <div className="p-4 pb-20">
-      <Link to="/profile" className="text-tg-link text-sm">
-        ← {t('nav.profile')}
-      </Link>
-      <h1 className="text-xl font-bold mt-1 mb-4">{t('analytics.title')}</h1>
+    <div className="p-4 pb-24">
+      <PageHeader back title={t('analytics.title')} />
 
-      {loading && <p className="text-tg-hint">{t('common.loading')}</p>}
+      {loading && (
+        <>
+          <CardSkeleton />
+          <CardSkeleton />
+        </>
+      )}
 
       {data && (
         <>
-          <h2 className="text-sm font-semibold text-tg-hint mb-2">{t('analytics.campaignsByStatus')}</h2>
+          <h2 className="text-xs font-semibold uppercase tracking-wide text-ink-400 mb-2">
+            {t('analytics.campaignsByStatus')}
+          </h2>
           <div className="grid grid-cols-3 gap-2 mb-4">
             {Object.entries(data.campaignsByStatus).map(([status, count]) => (
-              <div key={status} className="rounded-xl border border-tg-secondaryBg p-2 text-center">
-                <div className="text-lg font-bold">{count}</div>
-                <div className="text-[10px] text-tg-hint">{status}</div>
-              </div>
+              <MiniStat key={status} label={status} value={count} />
             ))}
           </div>
 
-          <p className="text-xs text-tg-hint mb-4">
-            {t('analytics.acceptanceRate')}: <strong>{data.applications.acceptanceRate}%</strong> (
+          <p className="text-xs text-ink-400 mb-5">
+            {t('analytics.acceptanceRate')}: <strong className="text-ink-800">{data.applications.acceptanceRate}%</strong> (
             {data.applications.accepted}/{data.applications.total})
           </p>
 
-          <h2 className="text-sm font-semibold text-tg-hint mb-2">{t('analytics.cpaPerformance')}</h2>
-          <div className="grid grid-cols-3 gap-2 mb-4">
-            <div className="rounded-xl border border-tg-secondaryBg p-2 text-center">
-              <div className="text-lg font-bold">{data.cpa.totalClicks}</div>
-              <div className="text-[10px] text-tg-hint">{t('analytics.clicks')}</div>
-            </div>
-            <div className="rounded-xl border border-tg-secondaryBg p-2 text-center">
-              <div className="text-lg font-bold">{data.cpa.confirmedConversions}</div>
-              <div className="text-[10px] text-tg-hint">{t('analytics.conversions')}</div>
-            </div>
-            <div className="rounded-xl border border-tg-secondaryBg p-2 text-center">
-              <div className="text-lg font-bold">{data.cpa.conversionRate}%</div>
-              <div className="text-[10px] text-tg-hint">{t('analytics.conversionRate')}</div>
-            </div>
+          <h2 className="text-xs font-semibold uppercase tracking-wide text-ink-400 mb-2">
+            {t('analytics.cpaPerformance')}
+          </h2>
+          <div className="grid grid-cols-3 gap-2 mb-5">
+            <MiniStat label={t('analytics.clicks')} value={data.cpa.totalClicks} />
+            <MiniStat label={t('analytics.conversions')} value={data.cpa.confirmedConversions} />
+            <MiniStat label={t('analytics.conversionRate')} value={`${data.cpa.conversionRate}%`} />
           </div>
 
           {data.topCreators.length > 0 && (
             <>
-              <h2 className="text-sm font-semibold text-tg-hint mb-2">{t('analytics.topCreators')}</h2>
+              <h2 className="text-xs font-semibold uppercase tracking-wide text-ink-400 mb-2">
+                {t('analytics.topCreators')}
+              </h2>
               <div className="space-y-2">
                 {data.topCreators.map((c) => (
-                  <div
-                    key={c.creatorId}
-                    className="rounded-xl border border-tg-secondaryBg p-3 flex justify-between items-center"
-                  >
-                    <span className="text-sm font-medium">{c.name}</span>
-                    <span className="text-xs text-tg-hint">
+                  <Card key={c.creatorId} className="flex justify-between items-center">
+                    <span className="text-sm font-semibold text-ink-900">{c.name}</span>
+                    <span className="text-xs text-ink-400">
                       {c.acceptedCount} {t('analytics.acceptedCampaigns')}
                     </span>
-                  </div>
+                  </Card>
                 ))}
               </div>
             </>

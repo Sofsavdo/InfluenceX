@@ -1,7 +1,10 @@
 import { useRef, useState, type ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Paperclip, AlertTriangle } from 'lucide-react';
 import { apiClient } from '../api/client';
 import { uploadFile } from '../lib/upload';
+import { Textarea } from './ui/Field';
+import { Button } from './ui/Button';
 
 interface DisputeFormProps {
   escrowId: string;
@@ -12,6 +15,7 @@ interface DisputeFormProps {
 // PRD v2 §Escrow: "Nizo holatida moderator dalillarni ko'rib chiqadi" - shu forma orqali
 // creator/business sabab + ixtiyoriy dalil (screenshot/video) bilan nizo ochadi.
 // Ikkalasi ham (Applications.tsx va CampaignApplicants.tsx) shu komponentdan foydalanadi.
+// 2026-07-14: dizayn tizimi qo'llanildi - mantiq/API chaqiruvlari o'zgarmagan.
 export function DisputeForm({ escrowId, onDone, onCancel }: DisputeFormProps) {
   const { t } = useTranslation();
   const [reason, setReason] = useState('');
@@ -55,10 +59,12 @@ export function DisputeForm({ escrowId, onDone, onCancel }: DisputeFormProps) {
   }
 
   return (
-    <div className="rounded-xl border border-red-200 bg-red-50 p-3 mt-2">
-      <p className="text-sm font-semibold text-red-700 mb-2">{t('dispute.title')}</p>
-      <textarea
-        className="w-full rounded-lg border border-tg-secondaryBg p-2 text-sm"
+    <div className="rounded-xl border border-danger-dot/20 bg-danger-bg p-3 mt-3">
+      <p className="text-sm font-semibold text-danger-text mb-2 flex items-center gap-1.5">
+        <AlertTriangle size={15} />
+        {t('dispute.title')}
+      </p>
+      <Textarea
         rows={3}
         placeholder={t('dispute.reasonPlaceholder') as string}
         value={reason}
@@ -69,30 +75,24 @@ export function DisputeForm({ escrowId, onDone, onCancel }: DisputeFormProps) {
       <button
         onClick={() => fileInputRef.current?.click()}
         disabled={uploading}
-        className="mt-2 text-xs text-tg-link disabled:opacity-50"
+        className="tap-scale mt-2 text-xs font-medium text-accent-600 disabled:opacity-50 inline-flex items-center gap-1"
       >
-        {uploading ? t('common.loading') : `📎 ${t('dispute.addEvidence')}`}
+        <Paperclip size={13} />
+        {uploading ? t('common.loading') : t('dispute.addEvidence')}
       </button>
       {evidenceUrls.length > 0 && (
-        <p className="text-xs text-tg-hint mt-1">{evidenceUrls.length} {t('dispute.filesAttached')}</p>
+        <p className="text-xs text-ink-400 mt-1">{evidenceUrls.length} {t('dispute.filesAttached')}</p>
       )}
 
-      {error && <p className="text-red-600 text-xs mt-2">{error}</p>}
+      {error && <p className="text-danger-text text-xs mt-2">{error}</p>}
 
       <div className="flex gap-2 mt-3">
-        <button
-          onClick={submit}
-          disabled={submitting}
-          className="flex-1 rounded-lg bg-red-600 text-white py-2 text-sm font-semibold disabled:opacity-50"
-        >
+        <Button variant="danger" size="sm" full loading={submitting} onClick={submit}>
           {t('dispute.submit')}
-        </button>
-        <button
-          onClick={onCancel}
-          className="rounded-lg border border-tg-secondaryBg px-4 py-2 text-sm"
-        >
+        </Button>
+        <Button variant="secondary" size="sm" onClick={onCancel}>
           {t('common.cancel')}
-        </button>
+        </Button>
       </div>
     </div>
   );

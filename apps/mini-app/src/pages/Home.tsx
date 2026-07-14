@@ -1,7 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Sparkles } from 'lucide-react';
 import { apiClient } from '../api/client';
 import { CampaignCard } from '../components/CampaignCard';
+import { Button } from '../components/ui/Button';
+import { CardSkeleton } from '../components/ui/Skeleton';
+import { EmptyState } from '../components/ui/EmptyState';
 import type { CampaignDto } from '@influencex/shared';
 
 interface PaginatedCampaigns {
@@ -16,6 +20,7 @@ interface PaginatedCampaigns {
 // Feed sahifalangan (2026-07-11 unumdorlik tuzatishi) - "Yana ko'rsatish" tugmasi
 // bilan bosqichma-bosqich yuklanadi, bir vaqtning o'zida yuzlab kampaniyani
 // olib kelib UI'ni sekinlashtirmaydi.
+// 2026-07-14: dizayn tizimi (ui/*) qo'llanildi - mantiq/API chaqiruvlari o'zgarmagan.
 export default function Home() {
   const { t } = useTranslation();
   const [campaigns, setCampaigns] = useState<CampaignDto[]>([]);
@@ -43,21 +48,29 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="p-4 pb-20">
-      <h1 className="text-xl font-bold mb-4">{t('home.title')}</h1>
-      {loading && <p className="text-tg-hint">{t('common.loading')}</p>}
-      {!loading && campaigns.length === 0 && <p className="text-tg-hint">{t('home.empty')}</p>}
+    <div className="p-4 pb-24">
+      <h1 className="text-2xl font-extrabold text-ink-900 tracking-tight mb-5">{t('home.title')}</h1>
+
+      {loading && (
+        <>
+          <CardSkeleton />
+          <CardSkeleton />
+          <CardSkeleton />
+        </>
+      )}
+
+      {!loading && campaigns.length === 0 && (
+        <EmptyState icon={<Sparkles size={24} />} title={t('home.empty')} />
+      )}
+
       {campaigns.map((c) => (
         <CampaignCard key={c.id} campaign={c} />
       ))}
+
       {!loading && page < totalPages && (
-        <button
-          onClick={() => loadPage(page + 1, true)}
-          disabled={loadingMore}
-          className="w-full rounded-lg border border-tg-secondaryBg py-2.5 text-sm font-semibold mt-2 disabled:opacity-50"
-        >
-          {loadingMore ? t('common.loading') : t('home.loadMore')}
-        </button>
+        <Button variant="secondary" full loading={loadingMore} onClick={() => loadPage(page + 1, true)} className="mt-1">
+          {t('home.loadMore')}
+        </Button>
       )}
     </div>
   );

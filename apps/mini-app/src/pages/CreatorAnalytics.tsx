@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Award, Star } from 'lucide-react';
 import { apiClient } from '../api/client';
+import { PageHeader } from '../components/ui/PageHeader';
+import { StatCard } from '../components/ui/StatCard';
+import { CardSkeleton } from '../components/ui/Skeleton';
 
 interface CreatorAnalyticsData {
   applications: { total: number; accepted: number; rejected: number; pending: number; acceptanceRate: number };
@@ -10,8 +13,18 @@ interface CreatorAnalyticsData {
   cpa: { totalClicks: number; totalConversions: number; confirmedConversions: number; conversionRate: number };
 }
 
+function MiniStat({ label, value }: { label: string; value: React.ReactNode }) {
+  return (
+    <div className="rounded-xl border border-ink-100 bg-white p-2.5 text-center shadow-card">
+      <div className="text-lg font-extrabold text-ink-900">{value}</div>
+      <div className="text-[10px] text-ink-400 mt-0.5">{label}</div>
+    </div>
+  );
+}
+
 // PRD Creator Dashboard "Analytics" - haqiqiy DB yozuvlaridan hisoblangan zayavkalar
 // funneli, tugatilgan kampaniyalar soni va CPA bosish/konversiya darajasi.
+// 2026-07-14: dizayn tizimi qo'llanildi - mantiq/API chaqiruvlari o'zgarmagan.
 export default function CreatorAnalytics() {
   const { t } = useTranslation();
   const [data, setData] = useState<CreatorAnalyticsData | null>(null);
@@ -25,59 +38,48 @@ export default function CreatorAnalytics() {
   }, []);
 
   return (
-    <div className="p-4 pb-20">
-      <Link to="/profile" className="text-tg-link text-sm">
-        ← {t('nav.profile')}
-      </Link>
-      <h1 className="text-xl font-bold mt-1 mb-4">{t('analytics.title')}</h1>
+    <div className="p-4 pb-24">
+      <PageHeader back title={t('analytics.title')} />
 
-      {loading && <p className="text-tg-hint">{t('common.loading')}</p>}
+      {loading && (
+        <>
+          <CardSkeleton />
+          <CardSkeleton />
+        </>
+      )}
 
       {data && (
         <>
-          <h2 className="text-sm font-semibold text-tg-hint mb-2">{t('analytics.applicationsFunnel')}</h2>
-          <div className="grid grid-cols-4 gap-2 mb-4">
-            {[
-              { label: t('applicants.status.pending'), value: data.applications.pending },
-              { label: t('applicants.status.accepted'), value: data.applications.accepted },
-              { label: t('applicants.status.rejected'), value: data.applications.rejected },
-              { label: t('analytics.total'), value: data.applications.total },
-            ].map((s) => (
-              <div key={s.label} className="rounded-xl border border-tg-secondaryBg p-2 text-center">
-                <div className="text-lg font-bold">{s.value}</div>
-                <div className="text-[10px] text-tg-hint">{s.label}</div>
-              </div>
-            ))}
+          <h2 className="text-xs font-semibold uppercase tracking-wide text-ink-400 mb-2">
+            {t('analytics.applicationsFunnel')}
+          </h2>
+          <div className="grid grid-cols-4 gap-2 mb-3">
+            <MiniStat label={t('applicants.status.pending')} value={data.applications.pending} />
+            <MiniStat label={t('applicants.status.accepted')} value={data.applications.accepted} />
+            <MiniStat label={t('applicants.status.rejected')} value={data.applications.rejected} />
+            <MiniStat label={t('analytics.total')} value={data.applications.total} />
           </div>
-          <p className="text-xs text-tg-hint mb-4">
-            {t('analytics.acceptanceRate')}: <strong>{data.applications.acceptanceRate}%</strong>
+          <p className="text-xs text-ink-400 mb-5">
+            {t('analytics.acceptanceRate')}:{' '}
+            <strong className="text-ink-800">{data.applications.acceptanceRate}%</strong>
           </p>
 
-          <div className="grid grid-cols-2 gap-3 mb-4">
-            <div className="rounded-xl border border-tg-secondaryBg p-4">
-              <p className="text-xs text-tg-hint mb-1">{t('analytics.campaignsCompleted')}</p>
-              <p className="text-lg font-bold">{data.campaignsCompleted}</p>
-            </div>
-            <div className="rounded-xl border border-tg-secondaryBg p-4">
-              <p className="text-xs text-tg-hint mb-1">{t('profile.rating')}</p>
-              <p className="text-lg font-bold">{data.profile.rating.toFixed(1)}</p>
-            </div>
+          <div className="grid grid-cols-2 gap-3 mb-5">
+            <StatCard
+              label={t('analytics.campaignsCompleted')}
+              icon={<Award size={16} />}
+              value={data.campaignsCompleted}
+            />
+            <StatCard label={t('profile.rating')} icon={<Star size={16} />} value={data.profile.rating.toFixed(1)} />
           </div>
 
-          <h2 className="text-sm font-semibold text-tg-hint mb-2">{t('analytics.cpaPerformance')}</h2>
+          <h2 className="text-xs font-semibold uppercase tracking-wide text-ink-400 mb-2">
+            {t('analytics.cpaPerformance')}
+          </h2>
           <div className="grid grid-cols-3 gap-2 mb-4">
-            <div className="rounded-xl border border-tg-secondaryBg p-2 text-center">
-              <div className="text-lg font-bold">{data.cpa.totalClicks}</div>
-              <div className="text-[10px] text-tg-hint">{t('analytics.clicks')}</div>
-            </div>
-            <div className="rounded-xl border border-tg-secondaryBg p-2 text-center">
-              <div className="text-lg font-bold">{data.cpa.confirmedConversions}</div>
-              <div className="text-[10px] text-tg-hint">{t('analytics.conversions')}</div>
-            </div>
-            <div className="rounded-xl border border-tg-secondaryBg p-2 text-center">
-              <div className="text-lg font-bold">{data.cpa.conversionRate}%</div>
-              <div className="text-[10px] text-tg-hint">{t('analytics.conversionRate')}</div>
-            </div>
+            <MiniStat label={t('analytics.clicks')} value={data.cpa.totalClicks} />
+            <MiniStat label={t('analytics.conversions')} value={data.cpa.confirmedConversions} />
+            <MiniStat label={t('analytics.conversionRate')} value={`${data.cpa.conversionRate}%`} />
           </div>
         </>
       )}

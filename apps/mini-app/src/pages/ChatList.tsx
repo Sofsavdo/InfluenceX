@@ -1,7 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { MessageCircle, ChevronRight } from 'lucide-react';
 import { apiClient } from '../api/client';
+import { PageHeader } from '../components/ui/PageHeader';
+import { Card } from '../components/ui/Card';
+import { CardSkeleton } from '../components/ui/Skeleton';
+import { EmptyState } from '../components/ui/EmptyState';
+import { StatusBadge } from '../components/ui/Badge';
 
 interface ApplicationWithThread {
   id: string;
@@ -12,6 +18,7 @@ interface ApplicationWithThread {
 
 // PRD v2 §4.6: Mini App ichidagi chatlar ro'yxati (bottom-nav "Chat" tab).
 // Har bir suhbat ACCEPTED zayavka bilan birga avtomatik ochiladi (applications.service.ts).
+// 2026-07-14: dizayn tizimi qo'llanildi - mantiq/API chaqiruvlari o'zgarmagan.
 export default function ChatList() {
   const { t } = useTranslation();
   const [applications, setApplications] = useState<ApplicationWithThread[]>([]);
@@ -25,23 +32,35 @@ export default function ChatList() {
   }, []);
 
   return (
-    <div className="p-4 pb-20">
-      <h1 className="text-xl font-bold mb-4">{t('nav.chat')}</h1>
-      {loading && <p className="text-tg-hint">{t('common.loading')}</p>}
-      {!loading && applications.length === 0 && (
-        <p className="text-tg-hint">
-          Suhbat kampaniya zayavkasi qabul qilingandan so'ng ochiladi. "{t('nav.applications')}" bo'limidan holatni
-          tekshiring.
-        </p>
+    <div className="p-4 pb-24">
+      <PageHeader title={t('nav.chat')} />
+
+      {loading && (
+        <>
+          <CardSkeleton />
+          <CardSkeleton />
+        </>
       )}
+
+      {!loading && applications.length === 0 && (
+        <EmptyState
+          icon={<MessageCircle size={24} />}
+          title={t('nav.chat')}
+          subtitle={`Suhbat kampaniya zayavkasi qabul qilingandan so'ng ochiladi. "${t('nav.applications')}" bo'limidan holatni tekshiring.`}
+        />
+      )}
+
       {applications.map((app) => (
-        <Link
-          key={app.id}
-          to={`/chat/${app.chatThread!.id}`}
-          className="block rounded-xl border border-tg-secondaryBg p-4 mb-3"
-        >
-          <div className="font-semibold">{app.campaign?.title}</div>
-          <div className="text-xs text-tg-hint mt-1">{app.status}</div>
+        <Link key={app.id} to={`/chat/${app.chatThread!.id}`} className="block mb-3">
+          <Card interactive className="flex items-center justify-between gap-3">
+            <div className="min-w-0">
+              <div className="font-semibold text-ink-900 text-[15px] truncate">{app.campaign?.title}</div>
+              <div className="mt-1.5">
+                <StatusBadge status={app.status} />
+              </div>
+            </div>
+            <ChevronRight size={18} className="text-ink-300 shrink-0" />
+          </Card>
         </Link>
       ))}
     </div>

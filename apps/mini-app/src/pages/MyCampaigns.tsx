@@ -1,9 +1,16 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
+import { Star, ChevronRight, ClipboardList } from 'lucide-react';
 import { apiClient } from '../api/client';
 import type { CampaignDto } from '@influencex/shared';
 import { CampaignStatus } from '@influencex/shared';
+import { PageHeader } from '../components/ui/PageHeader';
+import { Card } from '../components/ui/Card';
+import { CardSkeleton } from '../components/ui/Skeleton';
+import { EmptyState } from '../components/ui/EmptyState';
+import { StatusBadge } from '../components/ui/Badge';
+import { Button } from '../components/ui/Button';
 
 type CampaignWithCount = CampaignDto & { _count?: { applications: number } };
 
@@ -18,6 +25,7 @@ const NEXT_STATUS: Partial<Record<CampaignStatus, CampaignStatus>> = {
 // mavjud emas edi, biznes o'z kampaniyalarini faqat ommaviy feedda tasodifan
 // topgandan keyingina boshqara olardi. Shu yerdan status o'zgartirish (nashr
 // qilish/yakunlash/bekor qilish) va "Featured" qilib belgilash mumkin.
+// 2026-07-14: dizayn tizimi qo'llanildi - mantiq/API chaqiruvlari o'zgarmagan.
 export default function MyCampaigns() {
   const { t } = useTranslation();
   const [campaigns, setCampaigns] = useState<CampaignWithCount[]>([]);
@@ -68,27 +76,38 @@ export default function MyCampaigns() {
   }
 
   return (
-    <div className="p-4 pb-20">
-      <div className="flex justify-between items-center">
-        <Link to="/profile" className="text-tg-link text-sm">
-          ← {t('nav.profile')}
-        </Link>
-        {/* PRD kelajak reja "Shop Integrations" - yengil versiya (2026-07-12) */}
-        <Link to="/products" className="text-tg-link text-sm">
-          {t('products.title')} →
-        </Link>
-      </div>
-      <h1 className="text-xl font-bold mt-1 mb-4">{t('myCampaigns.title')}</h1>
-
-      {error && <p className="text-red-600 text-sm mb-3">{error}</p>}
-      {loading && <p className="text-tg-hint">{t('common.loading')}</p>}
-      {!loading && campaigns.length === 0 && (
-        <p className="text-tg-hint">
-          {t('myCampaigns.empty')}{' '}
-          <Link to="/campaigns/new" className="text-tg-link">
-            {t('createCampaign.title')}
+    <div className="p-4 pb-24">
+      <PageHeader
+        back
+        title={t('myCampaigns.title')}
+        action={
+          // PRD kelajak reja "Shop Integrations" - yengil versiya (2026-07-12)
+          <Link to="/products" className="tap-scale text-accent-600 text-sm font-medium inline-flex items-center gap-0.5">
+            {t('products.title')}
+            <ChevronRight size={14} />
           </Link>
-        </p>
+        }
+      />
+
+      {error && <p className="text-danger-text text-sm mb-3">{error}</p>}
+
+      {loading && (
+        <>
+          <CardSkeleton />
+          <CardSkeleton />
+        </>
+      )}
+
+      {!loading && campaigns.length === 0 && (
+        <EmptyState
+          icon={<ClipboardList size={24} />}
+          title={t('myCampaigns.empty')}
+          action={
+            <Link to="/campaigns/new">
+              <Button size="sm">{t('createCampaign.title')}</Button>
+            </Link>
+          }
+        />
       )}
 
       <div className="space-y-3">
@@ -96,58 +115,52 @@ export default function MyCampaigns() {
           const nextStatus = NEXT_STATUS[c.status];
           const isFeaturedActive = c.isFeatured && c.featuredUntil && new Date(c.featuredUntil) > new Date();
           return (
-            <div key={c.id} className="rounded-xl border border-tg-secondaryBg p-4">
+            <Card key={c.id}>
               <div className="flex justify-between items-start gap-2">
-                <Link to={`/campaigns/${c.id}`} className="font-semibold">
+                <Link to={`/campaigns/${c.id}`} className="font-semibold text-ink-900 text-[15px]">
                   {c.title}
                 </Link>
-                <span className="text-xs rounded-full bg-tg-secondaryBg px-2 py-1 shrink-0">{c.status}</span>
+                <StatusBadge status={c.status} />
               </div>
-              <p className="text-xs text-tg-hint mt-1">
+              <p className="text-xs text-ink-400 mt-1">
                 {t('myCampaigns.applicants')}: {c._count?.applications ?? 0}
               </p>
               {isFeaturedActive && (
-                <p className="text-xs text-yellow-600 mt-1">
-                  ⭐ {t('myCampaigns.featuredUntil')} {new Date(c.featuredUntil as string).toLocaleDateString()}
+                <p className="text-xs text-warning-text mt-1 flex items-center gap-1">
+                  <Star size={12} className="fill-warning-dot text-warning-dot" />
+                  {t('myCampaigns.featuredUntil')} {new Date(c.featuredUntil as string).toLocaleDateString()}
                 </p>
               )}
 
               <div className="flex flex-wrap gap-2 mt-3">
                 {nextStatus && (
-                  <button
-                    onClick={() => advance(c.id, nextStatus)}
-                    disabled={actingId === c.id}
-                    className="rounded-lg bg-tg-button text-tg-buttonText px-3 py-1.5 text-xs font-semibold disabled:opacity-50"
-                  >
+                  <Button size="sm" loading={actingId === c.id} onClick={() => advance(c.id, nextStatus)}>
                     {t(`myCampaigns.advanceTo.${nextStatus.toLowerCase()}`)}
-                  </button>
+                  </Button>
                 )}
                 {c.status !== CampaignStatus.COMPLETED && c.status !== CampaignStatus.CANCELLED && (
-                  <button
-                    onClick={() => cancel(c.id)}
-                    disabled={actingId === c.id}
-                    className="rounded-lg border border-tg-secondaryBg px-3 py-1.5 text-xs disabled:opacity-50"
-                  >
+                  <Button size="sm" variant="secondary" disabled={actingId === c.id} onClick={() => cancel(c.id)}>
                     {t('myCampaigns.cancel')}
-                  </button>
+                  </Button>
                 )}
                 {c.status === CampaignStatus.PUBLISHED && !isFeaturedActive && (
-                  <button
-                    onClick={() => feature(c.id)}
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    icon={<Star size={13} />}
                     disabled={actingId === c.id}
-                    className="rounded-lg border border-yellow-400 text-yellow-700 px-3 py-1.5 text-xs disabled:opacity-50"
+                    onClick={() => feature(c.id)}
                   >
-                    ⭐ {t('myCampaigns.feature')}
-                  </button>
+                    {t('myCampaigns.feature')}
+                  </Button>
                 )}
-                <Link
-                  to={`/campaigns/${c.id}/applicants`}
-                  className="rounded-lg border border-tg-secondaryBg px-3 py-1.5 text-xs"
-                >
-                  {t('applicants.viewApplicants')}
+                <Link to={`/campaigns/${c.id}/applicants`}>
+                  <Button size="sm" variant="secondary">
+                    {t('applicants.viewApplicants')}
+                  </Button>
                 </Link>
               </div>
-            </div>
+            </Card>
           );
         })}
       </div>

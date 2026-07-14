@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
+import { Paperclip, CheckCircle2, ChevronRight, ClipboardList } from 'lucide-react';
 import { apiClient } from '../api/client';
 import { uploadFile } from '../lib/upload';
 import { DisputeForm } from '../components/DisputeForm';
@@ -8,6 +9,13 @@ import { ConversionsPanel } from '../components/ConversionsPanel';
 import { RatingForm } from '../components/RatingForm';
 import type { ApplicationDto, EscrowDto } from '@influencex/shared';
 import { ApplicationStatus, CollaborationModel, EscrowStatus } from '@influencex/shared';
+import { PageHeader } from '../components/ui/PageHeader';
+import { Card } from '../components/ui/Card';
+import { CardSkeleton } from '../components/ui/Skeleton';
+import { EmptyState } from '../components/ui/EmptyState';
+import { StatusBadge } from '../components/ui/Badge';
+import { Input, Textarea } from '../components/ui/Field';
+import { Button } from '../components/ui/Button';
 
 type ApplicationWithEscrow = ApplicationDto & {
   escrow?: EscrowDto | null;
@@ -23,6 +31,7 @@ type ApplicationWithEscrow = ApplicationDto & {
 // PRD v2 §Creator Dashboard: "Applications" sahifasi — kreatorning barcha zayavkalari + escrow
 // holati. 2026-07-11: to'liq to'lov oqimi UI'ga ulandi - kontent topshirish (PRD workflow
 // 8-bosqich) va nizo ochish shu yerda.
+// 2026-07-14: dizayn tizimi qo'llanildi - mantiq/API chaqiruvlari o'zgarmagan.
 export default function Applications() {
   const { t } = useTranslation();
   const [applications, setApplications] = useState<ApplicationWithEscrow[]>([]);
@@ -86,20 +95,30 @@ export default function Applications() {
   }
 
   return (
-    <div className="p-4 pb-20">
-      <h1 className="text-xl font-bold mb-4">{t('nav.applications')}</h1>
-      {loading && <p className="text-tg-hint">{t('common.loading')}</p>}
-      {!loading && applications.length === 0 && <p className="text-tg-hint">{t('home.empty')}</p>}
+    <div className="p-4 pb-24">
+      <PageHeader title={t('nav.applications')} />
+
+      {loading && (
+        <>
+          <CardSkeleton />
+          <CardSkeleton />
+        </>
+      )}
+
+      {!loading && applications.length === 0 && (
+        <EmptyState icon={<ClipboardList size={24} />} title={t('home.empty')} />
+      )}
+
       {applications.map((app) => (
-        <div key={app.id} className="rounded-xl border border-tg-secondaryBg p-4 mb-3">
-          <div className="flex justify-between items-center">
-            <span className="font-semibold">{app.campaign?.title ?? app.campaignId}</span>
-            <span className="text-xs rounded-full bg-tg-secondaryBg px-2 py-1">{app.status}</span>
+        <Card key={app.id} className="mb-3">
+          <div className="flex justify-between items-center gap-2">
+            <span className="font-semibold text-ink-900 text-[15px]">{app.campaign?.title ?? app.campaignId}</span>
+            <StatusBadge status={app.status} />
           </div>
           {app.escrow && (
             <div className="mt-2 flex justify-between text-sm">
-              <span className="text-tg-hint">Escrow</span>
-              <span className="font-medium">{t(`escrow.${app.escrow.status.toLowerCase()}`)}</span>
+              <span className="text-ink-400">Escrow</span>
+              <span className="font-medium text-ink-800">{t(`escrow.${app.escrow.status.toLowerCase()}`)}</span>
             </div>
           )}
 
@@ -107,59 +126,53 @@ export default function Applications() {
           {app.escrow?.status === EscrowStatus.HELD && !app.contentSubmittedAt && (
             <div className="mt-3">
               {submittingContentFor === app.id ? (
-                <div className="rounded-lg border border-tg-secondaryBg p-3">
-                  <input
-                    className="w-full rounded-lg border border-tg-secondaryBg px-3 py-2 text-sm mb-2"
-                    placeholder={t('applications.contentUrlPlaceholder') as string}
-                    value={contentUrl}
-                    onChange={(e) => setContentUrl(e.target.value)}
-                  />
+                <div className="rounded-xl border border-ink-100 bg-ink-50 p-3">
+                  <div className="mb-2">
+                    <Input
+                      placeholder={t('applications.contentUrlPlaceholder') as string}
+                      value={contentUrl}
+                      onChange={(e) => setContentUrl(e.target.value)}
+                    />
+                  </div>
                   <input ref={contentFileInputRef} type="file" className="hidden" onChange={onContentFileSelected} />
                   <button
                     onClick={() => contentFileInputRef.current?.click()}
                     disabled={uploadingContent}
-                    className="text-xs text-tg-link mb-2 disabled:opacity-50"
+                    className="tap-scale text-xs font-medium text-accent-600 mb-2 disabled:opacity-50 inline-flex items-center gap-1"
                   >
-                    {uploadingContent ? t('common.loading') : `📎 ${t('applications.uploadInstead')}`}
+                    <Paperclip size={13} />
+                    {uploadingContent ? t('common.loading') : t('applications.uploadInstead')}
                   </button>
-                  <textarea
-                    className="w-full rounded-lg border border-tg-secondaryBg px-3 py-2 text-sm mb-2"
-                    rows={2}
-                    placeholder={t('applications.contentNotePlaceholder') as string}
-                    value={contentNote}
-                    onChange={(e) => setContentNote(e.target.value)}
-                  />
-                  {contentError && <p className="text-red-600 text-xs mb-2">{contentError}</p>}
+                  <div className="mb-2">
+                    <Textarea
+                      rows={2}
+                      placeholder={t('applications.contentNotePlaceholder') as string}
+                      value={contentNote}
+                      onChange={(e) => setContentNote(e.target.value)}
+                    />
+                  </div>
+                  {contentError && <p className="text-danger-text text-xs mb-2">{contentError}</p>}
                   <div className="flex gap-2">
-                    <button
-                      onClick={() => submitContent(app.id)}
-                      disabled={savingContent}
-                      className="flex-1 rounded-lg bg-tg-button text-tg-buttonText py-2 text-sm font-semibold disabled:opacity-50"
-                    >
+                    <Button size="sm" full loading={savingContent} onClick={() => submitContent(app.id)}>
                       {t('applications.sendContent')}
-                    </button>
-                    <button
-                      onClick={() => setSubmittingContentFor(null)}
-                      className="rounded-lg border border-tg-secondaryBg px-4 py-2 text-sm"
-                    >
+                    </Button>
+                    <Button size="sm" variant="secondary" onClick={() => setSubmittingContentFor(null)}>
                       {t('common.cancel')}
-                    </button>
+                    </Button>
                   </div>
                 </div>
               ) : (
-                <button
-                  onClick={() => setSubmittingContentFor(app.id)}
-                  className="w-full rounded-lg bg-tg-button text-tg-buttonText py-2 text-sm font-semibold"
-                >
+                <Button size="sm" full onClick={() => setSubmittingContentFor(app.id)}>
                   {t('applications.submitContent')}
-                </button>
+                </Button>
               )}
             </div>
           )}
 
           {app.contentSubmittedAt && (
-            <div className="mt-2 text-xs text-tg-hint">
-              ✓ {t('applications.contentSubmittedOn')} {new Date(app.contentSubmittedAt).toLocaleDateString()}
+            <div className="mt-2 text-xs text-ink-400 flex items-center gap-1.5">
+              <CheckCircle2 size={13} className="text-success-dot" />
+              {t('applications.contentSubmittedOn')} {new Date(app.contentSubmittedAt).toLocaleDateString()}
             </div>
           )}
 
@@ -175,19 +188,27 @@ export default function Applications() {
               />
             )}
 
-          <div className="flex gap-3 mt-2 items-center">
-            <Link to={`/campaigns/${app.campaignId}`} className="text-tg-link text-sm">
-              Kampaniyani ko'rish →
+          <div className="flex gap-4 mt-3 pt-3 border-t border-ink-100 items-center">
+            <Link
+              to={`/campaigns/${app.campaignId}`}
+              className="text-accent-600 text-sm font-medium inline-flex items-center gap-0.5"
+            >
+              Kampaniyani ko'rish
+              <ChevronRight size={14} />
             </Link>
             {app.chatThread && (
-              <Link to={`/chat/${app.chatThread.id}`} className="text-tg-link text-sm">
-                {t('nav.chat')} →
+              <Link
+                to={`/chat/${app.chatThread.id}`}
+                className="text-accent-600 text-sm font-medium inline-flex items-center gap-0.5"
+              >
+                {t('nav.chat')}
+                <ChevronRight size={14} />
               </Link>
             )}
             {app.escrow && [EscrowStatus.HELD, EscrowStatus.RELEASE_PENDING].includes(app.escrow.status) && (
               <button
                 onClick={() => setDisputeForEscrowId(disputeForEscrowId === app.escrow!.id ? null : app.escrow!.id)}
-                className="text-red-600 text-sm ml-auto"
+                className="tap-scale text-danger-text text-sm font-medium ml-auto"
               >
                 {t('dispute.raise')}
               </button>
@@ -214,7 +235,7 @@ export default function Applications() {
               onDone={() => {}}
             />
           )}
-        </div>
+        </Card>
       ))}
     </div>
   );

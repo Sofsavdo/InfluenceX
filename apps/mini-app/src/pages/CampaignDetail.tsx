@@ -1,8 +1,14 @@
 import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { Wallet, Calendar, Handshake, Film, CheckCircle2, Users } from 'lucide-react';
 import { apiClient } from '../api/client';
 import type { CampaignDto } from '@influencex/shared';
+import { PageHeader } from '../components/ui/PageHeader';
+import { Card } from '../components/ui/Card';
+import { Button } from '../components/ui/Button';
+import { Textarea } from '../components/ui/Field';
+import { Skeleton } from '../components/ui/Skeleton';
 
 type UserRole = 'CREATOR' | 'BUSINESS' | 'ADMIN' | 'MODERATOR';
 
@@ -13,13 +19,29 @@ interface MeResponse {
   } | null;
 }
 
+function DetailStat({ icon, label, value }: { icon: React.ReactNode; label: string; value: React.ReactNode }) {
+  return (
+    <div className="flex items-start gap-2.5">
+      <div className="h-8 w-8 rounded-lg bg-accent-50 text-accent-600 flex items-center justify-center shrink-0">
+        {icon}
+      </div>
+      <div>
+        <p className="text-xs text-ink-400">{label}</p>
+        <p className="font-semibold text-ink-900 text-sm mt-0.5">{value}</p>
+      </div>
+    </div>
+  );
+}
+
 // PRD v2 §4.3: kampaniya tafsilotlari.
 // - Kreator uchun: "Zayavka berish" formasi.
 // - Kampaniya egasi biznes uchun: forma o'rniga "Zayavkalarni ko'rish" havolasi.
 //   Qabul/rad qilish CampaignApplicants.tsx sahifasida amalga oshiriladi.
+// 2026-07-14: dizayn tizimi qo'llanildi - mantiq/holatlar o'zgarmagan.
 export default function CampaignDetail() {
   const { id } = useParams<{ id: string }>();
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   const [campaign, setCampaign] = useState<CampaignDto | null>(null);
   const [me, setMe] = useState<MeResponse | null>(null);
@@ -62,105 +84,62 @@ export default function CampaignDetail() {
 
   if (!campaign) {
     return (
-      <p className="p-4 text-tg-hint">
-        {t('common.loading')}
-      </p>
+      <div className="p-4 pb-24">
+        <Skeleton className="h-7 w-2/3 mb-3" />
+        <Skeleton className="h-4 w-full mb-1.5" />
+        <Skeleton className="h-4 w-4/5 mb-6" />
+        <Skeleton className="h-32 w-full" />
+      </div>
     );
   }
 
-  const isOwner =
-    me?.role === 'BUSINESS' &&
-    me.businessProfile?.id === campaign.businessId;
-
-  const canApply =
-    me?.role === 'CREATOR' &&
-    !isOwner &&
-    !applied;
+  const isOwner = me?.role === 'BUSINESS' && me.businessProfile?.id === campaign.businessId;
+  const canApply = me?.role === 'CREATOR' && !isOwner && !applied;
 
   return (
     <div className="p-4 pb-24">
-      <h1 className="text-xl font-bold">
-        {campaign.title}
-      </h1>
+      <PageHeader back title={campaign.title} />
 
-      <p className="mt-2 text-sm text-tg-hint">
-        {campaign.description}
-      </p>
+      <p className="text-sm text-ink-500 leading-relaxed -mt-3 mb-5">{campaign.description}</p>
 
-      <dl className="mt-4 grid grid-cols-2 gap-3 text-sm">
-        <div>
-          <dt className="text-tg-hint">
-            {t('home.budget')}
-          </dt>
-
-          <dd className="font-semibold">
-            {campaign.budget.toLocaleString()} {campaign.currency}
-          </dd>
-        </div>
-
-        <div>
-          <dt className="text-tg-hint">
-            {t('home.deadline')}
-          </dt>
-
-          <dd className="font-semibold">
-            {new Date(campaign.deadline).toLocaleDateString()}
-          </dd>
-        </div>
-
-        <div>
-          <dt className="text-tg-hint">
-            Hamkorlik modeli
-          </dt>
-
-          <dd className="font-semibold">
-            {campaign.collaborationModel}
-          </dd>
-        </div>
-
-        <div>
-          <dt className="text-tg-hint">
-            Kontent turi
-          </dt>
-
-          <dd className="font-semibold">
-            {campaign.contentType}
-          </dd>
-        </div>
-      </dl>
+      <Card className="grid grid-cols-2 gap-y-5 gap-x-3">
+        <DetailStat
+          icon={<Wallet size={16} />}
+          label={t('home.budget')}
+          value={`${campaign.budget.toLocaleString()} ${campaign.currency}`}
+        />
+        <DetailStat
+          icon={<Calendar size={16} />}
+          label={t('home.deadline')}
+          value={new Date(campaign.deadline).toLocaleDateString()}
+        />
+        <DetailStat icon={<Handshake size={16} />} label="Hamkorlik modeli" value={campaign.collaborationModel} />
+        <DetailStat icon={<Film size={16} />} label="Kontent turi" value={campaign.contentType} />
+      </Card>
 
       {isOwner ? (
-        <Link
-          to={`/campaigns/${id}/applicants`}
-          className="mt-6 block w-full rounded-lg bg-tg-button py-3 text-center font-semibold text-tg-buttonText"
-        >
+        <Button full size="lg" icon={<Users size={18} />} className="mt-6" onClick={() => navigate(`/campaigns/${id}/applicants`)}>
           {t('applicants.viewApplicants')}
-        </Link>
+        </Button>
       ) : canApply ? (
         <div className="mt-6">
-          <textarea
-            className="w-full rounded-lg border border-tg-secondaryBg p-3 text-sm"
-            rows={3}
+          <Textarea
             placeholder="Qisqa xabar (ixtiyoriy)"
+            rows={3}
             value={message}
             onChange={(event) => setMessage(event.target.value)}
           />
-
-          <button
-            type="button"
-            onClick={submitApplication}
-            disabled={submitting}
-            className="mt-3 w-full rounded-lg bg-tg-button py-3 font-semibold text-tg-buttonText disabled:opacity-50"
-          >
-            {submitting ? t('common.loading') : t('home.apply')}
-          </button>
+          <Button full size="lg" className="mt-3" loading={submitting} onClick={submitApplication}>
+            {t('home.apply')}
+          </Button>
         </div>
       ) : applied ? (
-        <p className="mt-6 text-center font-semibold text-green-600">
-          Zayavka yuborildi ✓
-        </p>
+        <div className="mt-8 flex flex-col items-center gap-2 text-success-text">
+          <CheckCircle2 size={32} />
+          <p className="font-semibold">Zayavka yuborildi</p>
+        </div>
       ) : (
-        <p className="mt-6 text-center text-sm text-tg-hint">
+        <p className="mt-6 text-center text-sm text-ink-400">
           Bu kampaniyaga faqat kreator profilidan zayavka yuborish mumkin.
         </p>
       )}

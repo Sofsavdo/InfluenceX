@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Star, CheckCircle2 } from 'lucide-react';
 import { apiClient } from '../api/client';
+import { Textarea } from './ui/Field';
+import { Button } from './ui/Button';
 
 interface RatingFormProps {
   campaignId: string;
@@ -19,6 +22,7 @@ interface HasRatedResponse {
 // ma'lumot bilan to'lmasdi (creatorScore/businessScore doim standart 0 qolardi).
 // Escrow RELEASED bo'lgach ikkala tomonda ham (Applications.tsx - kreator biznesni baholaydi,
 // CampaignApplicants.tsx - biznes kreatorni baholaydi) shu komponent ko'rsatiladi.
+// 2026-07-14: dizayn tizimi qo'llanildi - mantiq/API chaqiruvlari o'zgarmagan.
 export function RatingForm({ campaignId, targetUserId, onDone }: RatingFormProps) {
   const { t } = useTranslation();
   const [alreadyRated, setAlreadyRated] = useState<boolean | null>(null);
@@ -51,44 +55,44 @@ export function RatingForm({ campaignId, targetUserId, onDone }: RatingFormProps
 
   if (alreadyRated === null) return null;
   if (alreadyRated || submitted) {
-    return <p className="text-xs text-tg-hint mt-2">✓ {t('ratings.alreadyRated')}</p>;
+    return (
+      <p className="text-xs text-ink-400 mt-3 flex items-center gap-1.5">
+        <CheckCircle2 size={13} className="text-success-dot" />
+        {t('ratings.alreadyRated')}
+      </p>
+    );
   }
 
   return (
-    <div className="rounded-xl border border-tg-secondaryBg bg-tg-secondaryBg/30 p-3 mt-2">
-      <p className="text-sm font-semibold mb-1">{t('ratings.rateTitle')}</p>
-      <p className="text-xs text-tg-hint mb-2">{t('ratings.rateHint')}</p>
+    <div className="rounded-xl border border-ink-100 bg-ink-50 p-3 mt-3">
+      <p className="text-sm font-semibold text-ink-900 mb-1">{t('ratings.rateTitle')}</p>
+      <p className="text-xs text-ink-400 mb-2">{t('ratings.rateHint')}</p>
 
-      <div className="flex gap-1 mb-2">
+      <div className="flex gap-1 mb-3">
         {[1, 2, 3, 4, 5].map((n) => (
-          <button
-            key={n}
-            onClick={() => setScore(n)}
-            className={`text-2xl leading-none ${n <= score ? 'opacity-100' : 'opacity-30'}`}
-            aria-label={`${n}`}
-          >
-            ⭐
+          <button key={n} onClick={() => setScore(n)} className="tap-scale" aria-label={`${n}`}>
+            <Star
+              size={26}
+              className={n <= score ? 'text-warning-dot fill-warning-dot' : 'text-ink-200'}
+            />
           </button>
         ))}
       </div>
 
-      <textarea
-        className="w-full rounded-lg border border-tg-secondaryBg p-2 text-sm mb-2"
-        rows={2}
-        placeholder={t('ratings.commentPlaceholder') as string}
-        value={comment}
-        onChange={(e) => setComment(e.target.value)}
-      />
+      <div className="mb-2">
+        <Textarea
+          rows={2}
+          placeholder={t('ratings.commentPlaceholder') as string}
+          value={comment}
+          onChange={(e) => setComment(e.target.value)}
+        />
+      </div>
 
-      {error && <p className="text-red-600 text-xs mb-2">{error}</p>}
+      {error && <p className="text-danger-text text-xs mb-2">{error}</p>}
 
-      <button
-        onClick={submit}
-        disabled={submitting}
-        className="w-full rounded-lg bg-tg-button text-tg-buttonText py-2 text-sm font-semibold disabled:opacity-50"
-      >
-        {submitting ? t('common.loading') : t('ratings.submit')}
-      </button>
+      <Button full size="sm" loading={submitting} onClick={submit}>
+        {t('ratings.submit')}
+      </Button>
     </div>
   );
 }

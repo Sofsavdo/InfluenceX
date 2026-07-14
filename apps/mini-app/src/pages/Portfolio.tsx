@@ -1,8 +1,13 @@
 import { useEffect, useRef, useState, type ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Plus, Trash2, Images } from 'lucide-react';
 import { apiClient } from '../api/client';
 import { uploadFile } from '../lib/upload';
+import { PageHeader } from '../components/ui/PageHeader';
+import { Input } from '../components/ui/Field';
+import { Button } from '../components/ui/Button';
+import { EmptyState } from '../components/ui/EmptyState';
+import { Skeleton } from '../components/ui/Skeleton';
 
 interface PortfolioItem {
   id: string;
@@ -18,6 +23,7 @@ function isVideo(url: string) {
 // PRD "Creator Profiles" -> portfolio maydoni / "Creator Dashboard" -> "Portfolio" sahifasi.
 // Kreator ilgari qilgan ishlaridan namunalar qo'shadi - biznes zayavkachini ko'rib chiqishda
 // (yoki AI Matching orqali tavsiya etilganda) shu namunalarga qarab baholaydi.
+// 2026-07-14: dizayn tizimi qo'llanildi - mantiq/API chaqiruvlari o'zgarmagan.
 export default function Portfolio() {
   const { t } = useTranslation();
   const [items, setItems] = useState<PortfolioItem[]>([]);
@@ -72,20 +78,17 @@ export default function Portfolio() {
   }
 
   return (
-    <div className="p-4 pb-20">
-      <Link to="/profile" className="text-tg-link text-sm">
-        ← {t('nav.profile')}
-      </Link>
-      <h1 className="text-xl font-bold mt-1 mb-1">{t('portfolio.title')}</h1>
-      <p className="text-xs text-tg-hint mb-4">{t('portfolio.hint')}</p>
+    <div className="p-4 pb-24">
+      <PageHeader back title={t('portfolio.title')} subtitle={t('portfolio.hint')} />
 
-      <div className="rounded-xl border border-dashed border-tg-secondaryBg p-4 mb-4">
-        <input
-          className="w-full rounded-lg border border-tg-secondaryBg px-3 py-2 text-sm mb-2"
-          placeholder={t('portfolio.captionPlaceholder') as string}
-          value={caption}
-          onChange={(e) => setCaption(e.target.value)}
-        />
+      <div className="rounded-2xl border border-dashed border-ink-200 p-4 mb-5">
+        <div className="mb-2">
+          <Input
+            placeholder={t('portfolio.captionPlaceholder') as string}
+            value={caption}
+            onChange={(e) => setCaption(e.target.value)}
+          />
+        </div>
         <input
           ref={fileInputRef}
           type="file"
@@ -93,34 +96,37 @@ export default function Portfolio() {
           className="hidden"
           onChange={onFileSelected}
         />
-        <button
-          onClick={() => fileInputRef.current?.click()}
-          disabled={uploading}
-          className="w-full rounded-lg bg-tg-button text-tg-buttonText py-2.5 text-sm font-semibold disabled:opacity-50"
-        >
-          {uploading ? t('common.loading') : `+ ${t('portfolio.addItem')}`}
-        </button>
-        {error && <p className="text-red-600 text-xs mt-2">{error}</p>}
+        <Button full icon={<Plus size={16} />} loading={uploading} onClick={() => fileInputRef.current?.click()}>
+          {t('portfolio.addItem')}
+        </Button>
+        {error && <p className="text-danger-text text-xs mt-2">{error}</p>}
       </div>
 
-      {loading && <p className="text-tg-hint">{t('common.loading')}</p>}
-      {!loading && items.length === 0 && <p className="text-tg-hint">{t('portfolio.empty')}</p>}
+      {loading && (
+        <div className="grid grid-cols-2 gap-3">
+          <Skeleton className="aspect-square rounded-2xl" />
+          <Skeleton className="aspect-square rounded-2xl" />
+        </div>
+      )}
+
+      {!loading && items.length === 0 && <EmptyState icon={<Images size={24} />} title={t('portfolio.empty')} />}
 
       <div className="grid grid-cols-2 gap-3">
         {items.map((item) => (
-          <div key={item.id} className="rounded-xl border border-tg-secondaryBg overflow-hidden">
+          <div key={item.id} className="rounded-2xl border border-ink-100 overflow-hidden bg-white shadow-card">
             {isVideo(item.mediaUrl) ? (
               <video src={item.mediaUrl} className="w-full aspect-square object-cover" controls />
             ) : (
               <img src={item.mediaUrl} alt={item.caption ?? ''} className="w-full aspect-square object-cover" />
             )}
-            <div className="p-2">
-              {item.caption && <p className="text-xs truncate">{item.caption}</p>}
+            <div className="p-2.5">
+              {item.caption && <p className="text-xs text-ink-600 truncate">{item.caption}</p>}
               <button
                 onClick={() => remove(item.id)}
                 disabled={deletingId === item.id}
-                className="text-red-600 text-xs mt-1 disabled:opacity-50"
+                className="tap-scale text-danger-text text-xs mt-1.5 disabled:opacity-50 inline-flex items-center gap-1"
               >
+                <Trash2 size={12} />
                 {t('common.delete')}
               </button>
             </div>
