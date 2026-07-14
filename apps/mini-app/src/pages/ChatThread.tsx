@@ -117,7 +117,7 @@ export default function ChatThread() {
         {messages.map((m) => (
           <div
             key={m.id}
-            className={`rounded-2xl px-3.5 py-2.5 text-sm max-w-[80%] leading-relaxed ${
+            className={`rounded-2xl px-3.5 py-2.5 text-sm max-w-[80%] leading-relaxed break-words ${
               m.senderId === myUserId
                 ? 'bg-accent-500 text-white ml-auto rounded-br-md'
                 : 'bg-ink-100 text-ink-900 rounded-bl-md'

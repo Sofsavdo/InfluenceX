@@ -44,7 +44,8 @@ export function BottomNav() {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 flex justify-around border-t border-ink-100 bg-white/95 backdrop-blur pb-[env(safe-area-inset-bottom)] pt-1.5 z-10">
+    <nav className="fixed bottom-0 left-0 right-0 z-10 border-t border-ink-100 bg-white/95 backdrop-blur pt-1.5 pb-[env(safe-area-inset-bottom)]">
+      <div className="flex justify-around max-w-lg mx-auto">
       {tabs.map((tab) => (
         <NavLink
           key={tab.to}
@@ -65,6 +66,7 @@ export function BottomNav() {
           )}
         </NavLink>
       ))}
+      </div>
     </nav>
   );
 }

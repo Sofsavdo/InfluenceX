@@ -212,7 +212,7 @@ export default function CampaignApplicants() {
                 </Badge>
               </div>
 
-              {app.message && <p className="text-sm text-ink-700 mt-2">{app.message}</p>}
+              {app.message && <p className="text-sm text-ink-700 mt-2 break-words">{app.message}</p>}
               {app.proposedPrice != null && (
                 <p className="text-sm mt-1 text-ink-400">
                   {t('applicants.proposedPrice')}:{' '}

@@ -68,9 +68,18 @@ export function RatingForm({ campaignId, targetUserId, onDone }: RatingFormProps
       <p className="text-sm font-semibold text-ink-900 mb-1">{t('ratings.rateTitle')}</p>
       <p className="text-xs text-ink-400 mb-2">{t('ratings.rateHint')}</p>
 
-      <div className="flex gap-1 mb-3">
+      {/* 2026-07-14 (UX audit): avvalgi yulduzcha tugmalari atrofida padding yo'q edi
+          (~26x26px teginish maydoni) - endi har bir yulduzcha kamida 44x44px bosiladigan
+          maydonga ega, lekin ko'rinadigan hajm (ikonka o'lchami) o'zgarmagan holda saqlanadi. */}
+      <div className="flex gap-0.5 mb-3 -ml-2.5">
         {[1, 2, 3, 4, 5].map((n) => (
-          <button key={n} onClick={() => setScore(n)} className="tap-scale" aria-label={`${n}`}>
+          <button
+            key={n}
+            type="button"
+            onClick={() => setScore(n)}
+            className="tap-scale h-11 w-11 flex items-center justify-center"
+            aria-label={`${n}`}
+          >
             <Star
               size={26}
               className={n <= score ? 'text-warning-dot fill-warning-dot' : 'text-ink-200'}

@@ -7,3 +7,4 @@ export * from './Skeleton';
 export * from './Field';
 export * from './StatCard';
 export * from './Avatar';
+export * from './LanguageSwitcher';

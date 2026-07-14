@@ -26,7 +26,8 @@ import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
 import { Avatar } from '../components/ui/Avatar';
 import { StatCard } from '../components/ui/StatCard';
-import { Label, Input, Textarea } from '../components/ui/Field';
+import { Label, Input, Textarea, FormSection, StickyActionBar } from '../components/ui/Field';
+import { LanguageSwitcher, LanguageMultiSelect } from '../components/ui/LanguageSwitcher';
 import { Skeleton } from '../components/ui/Skeleton';
 
 interface PricingRecommendation {
@@ -417,6 +418,12 @@ export default function Profile() {
       </div>
       {photoError && <p className="text-danger-text text-xs mb-3">{photoError}</p>}
 
+      <Card>
+        <SectionTitle icon={<Globe size={16} className="text-accent-500" />}>Til / Язык / Language</SectionTitle>
+        <p className="text-xs text-ink-400 mb-3">Ilova interfeysi tili / Язык интерфейса / Interface language</p>
+        <LanguageSwitcher value={i18n.language} onChange={(code) => i18n.changeLanguage(code)} />
+      </Card>
+
       {me.creatorProfile && (
         <>
           <Card className="mb-4">
@@ -453,72 +460,69 @@ export default function Profile() {
             )}
 
             {editingCreator && (
-              <div className="mt-4 space-y-3 border-t border-ink-100 pt-4">
-                <div>
-                  <Label>{t('profile.nameField')}</Label>
-                  <Input value={crName} onChange={(e) => setCrName(e.target.value)} />
-                </div>
-                <div className="grid grid-cols-2 gap-2">
+              <div className="mt-5 border-t border-ink-100 pt-5">
+                <FormSection title={t('profile.nameField') as string}>
                   <div>
-                    <Label>{t('profile.countryField')}</Label>
-                    <Input value={crCountry} onChange={(e) => setCrCountry(e.target.value)} />
+                    <Label>{t('profile.nameField')}</Label>
+                    <Input value={crName} onChange={(e) => setCrName(e.target.value)} invalid={!crName.trim() && Boolean(creatorInfoError)} />
                   </div>
-                  <div>
-                    <Label>{t('profile.cityField')}</Label>
-                    <Input value={crCity} onChange={(e) => setCrCity(e.target.value)} />
-                  </div>
-                </div>
-
-                <div>
-                  <Label>{t('profile.languagesField')}</Label>
-                  <div className="flex flex-wrap gap-2">
-                    {ALL_LANGUAGES.map((lang) => (
-                      <Chip key={lang} active={crLanguages.includes(lang)} onClick={() => toggleLanguage(lang)}>
-                        {lang.toUpperCase()}
-                      </Chip>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <Label>{t('profile.categoriesField')}</Label>
-                  <Input value={crCategories} onChange={(e) => setCrCategories(e.target.value)} />
-                </div>
-
-                <div>
-                  <Label>{t('profile.socialLinksField')}</Label>
-                  <div className="space-y-2">
-                    <Input placeholder="Instagram" value={crInstagram} onChange={(e) => setCrInstagram(e.target.value)} />
-                    <Input placeholder="TikTok" value={crTiktok} onChange={(e) => setCrTiktok(e.target.value)} />
-                    <Input placeholder="YouTube" value={crYoutube} onChange={(e) => setCrYoutube(e.target.value)} />
-                    <Input placeholder="Telegram" value={crTelegram} onChange={(e) => setCrTelegram(e.target.value)} />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-3 gap-2">
-                  <div>
-                    <Label>{t('profile.followers')}</Label>
-                    <Input type="number" min={0} value={crFollowers} onChange={(e) => setCrFollowers(e.target.value)} />
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <Label>{t('profile.countryField')}</Label>
+                      <Input value={crCountry} onChange={(e) => setCrCountry(e.target.value)} />
+                    </div>
+                    <div>
+                      <Label>{t('profile.cityField')}</Label>
+                      <Input value={crCity} onChange={(e) => setCrCity(e.target.value)} />
+                    </div>
                   </div>
                   <div>
-                    <Label>{t('profile.avgViewsField')}</Label>
-                    <Input type="number" min={0} value={crAvgViews} onChange={(e) => setCrAvgViews(e.target.value)} />
+                    <Label>{t('profile.categoriesField')}</Label>
+                    <Input value={crCategories} onChange={(e) => setCrCategories(e.target.value)} placeholder="fashion, tech, food..." />
                   </div>
-                  <div>
-                    <Label>{t('profile.engagementRateField')}</Label>
-                    <Input
-                      type="number"
-                      min={0}
-                      max={100}
-                      value={crEngagementRate}
-                      onChange={(e) => setCrEngagementRate(e.target.value)}
-                    />
+                </FormSection>
+
+                <FormSection title={t('profile.languagesField') as string}>
+                  <LanguageMultiSelect
+                    value={crLanguages}
+                    onToggle={(code) => toggleLanguage(code as Language)}
+                  />
+                </FormSection>
+
+                <FormSection title={t('profile.socialLinksField') as string}>
+                  <Input placeholder="Instagram" value={crInstagram} onChange={(e) => setCrInstagram(e.target.value)} />
+                  <Input placeholder="TikTok" value={crTiktok} onChange={(e) => setCrTiktok(e.target.value)} />
+                  <Input placeholder="YouTube" value={crYoutube} onChange={(e) => setCrYoutube(e.target.value)} />
+                  <Input placeholder="Telegram" value={crTelegram} onChange={(e) => setCrTelegram(e.target.value)} />
+                </FormSection>
+
+                <FormSection title={t('profile.followers') as string}>
+                  <div className="grid grid-cols-3 gap-3">
+                    <div>
+                      <Label>{t('profile.followers')}</Label>
+                      <Input inputMode="numeric" type="number" min={0} value={crFollowers} onChange={(e) => setCrFollowers(e.target.value)} />
+                    </div>
+                    <div>
+                      <Label>{t('profile.avgViewsField')}</Label>
+                      <Input inputMode="numeric" type="number" min={0} value={crAvgViews} onChange={(e) => setCrAvgViews(e.target.value)} />
+                    </div>
+                    <div>
+                      <Label hint="%">{t('profile.engagementRateField')}</Label>
+                      <Input
+                        inputMode="decimal"
+                        type="number"
+                        min={0}
+                        max={100}
+                        value={crEngagementRate}
+                        onChange={(e) => setCrEngagementRate(e.target.value)}
+                      />
+                    </div>
                   </div>
-                </div>
+                </FormSection>
 
-                {creatorInfoError && <p className="text-danger-text text-xs">{creatorInfoError}</p>}
+                {creatorInfoError && <p className="text-danger-text text-xs mb-3">{creatorInfoError}</p>}
 
-                <Button full loading={savingCreatorInfo} disabled={!crName.trim()} onClick={saveCreatorInfo}>
+                <Button full size="lg" loading={savingCreatorInfo} disabled={!crName.trim()} onClick={saveCreatorInfo}>
                   {t('common.save')}
                 </Button>
               </div>
@@ -644,29 +648,33 @@ export default function Profile() {
           )}
 
           {editingBusiness && (
-            <div className="mt-3 space-y-3 border-t border-ink-100 pt-4">
-              <div>
-                <Label>{t('profile.companyNameField')}</Label>
-                <Input value={bizCompanyName} onChange={(e) => setBizCompanyName(e.target.value)} />
-              </div>
-              <div>
-                <Label>{t('profile.descriptionFieldBiz')}</Label>
-                <Textarea rows={2} value={bizDescription} onChange={(e) => setBizDescription(e.target.value)} />
-              </div>
-              <div>
-                <Label>{t('profile.industryField')}</Label>
-                <Input value={bizIndustry} onChange={(e) => setBizIndustry(e.target.value)} />
-              </div>
-              <div>
-                <Label>{t('profile.websiteField')}</Label>
-                <Input value={bizWebsite} onChange={(e) => setBizWebsite(e.target.value)} />
-              </div>
-              <div>
-                <Label>{t('profile.contactPersonField')}</Label>
-                <Input value={bizContactPerson} onChange={(e) => setBizContactPerson(e.target.value)} />
-              </div>
-              {businessInfoError && <p className="text-danger-text text-xs">{businessInfoError}</p>}
-              <Button full loading={savingBusinessInfo} disabled={!bizCompanyName.trim()} onClick={saveBusinessInfo}>
+            <div className="mt-4 border-t border-ink-100 pt-5">
+              <FormSection title={t('profile.companyNameField') as string}>
+                <div>
+                  <Label>{t('profile.companyNameField')}</Label>
+                  <Input value={bizCompanyName} onChange={(e) => setBizCompanyName(e.target.value)} invalid={!bizCompanyName.trim() && Boolean(businessInfoError)} />
+                </div>
+                <div>
+                  <Label>{t('profile.descriptionFieldBiz')}</Label>
+                  <Textarea rows={3} value={bizDescription} onChange={(e) => setBizDescription(e.target.value)} />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label>{t('profile.industryField')}</Label>
+                    <Input value={bizIndustry} onChange={(e) => setBizIndustry(e.target.value)} />
+                  </div>
+                  <div>
+                    <Label>{t('profile.contactPersonField')}</Label>
+                    <Input value={bizContactPerson} onChange={(e) => setBizContactPerson(e.target.value)} />
+                  </div>
+                </div>
+                <div>
+                  <Label>{t('profile.websiteField')}</Label>
+                  <Input type="url" value={bizWebsite} onChange={(e) => setBizWebsite(e.target.value)} placeholder="https://" />
+                </div>
+              </FormSection>
+              {businessInfoError && <p className="text-danger-text text-xs mb-3">{businessInfoError}</p>}
+              <Button full size="lg" loading={savingBusinessInfo} disabled={!bizCompanyName.trim()} onClick={saveBusinessInfo}>
                 {t('common.save')}
               </Button>
             </div>
@@ -759,16 +767,6 @@ export default function Profile() {
         )}
       </Card>
 
-      <Card>
-        <SectionTitle icon={<Globe size={16} className="text-accent-500" />}>Til / Язык / Language</SectionTitle>
-        <div className="flex gap-2 mt-2">
-          {['uz', 'ru', 'en'].map((lng) => (
-            <Chip key={lng} active={i18n.language === lng} onClick={() => i18n.changeLanguage(lng)}>
-              {lng.toUpperCase()}
-            </Chip>
-          ))}
-        </div>
-      </Card>
     </div>
   );
 }

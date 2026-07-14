@@ -204,7 +204,7 @@ export default function Products() {
                 {p.visibleToCreators ? t('products.visible') : t('products.hidden')}
               </Badge>
             </div>
-            {p.description && <p className="text-xs text-ink-400 mt-1">{p.description}</p>}
+            {p.description && <p className="text-xs text-ink-400 mt-1 break-words">{p.description}</p>}
             <p className="text-xs text-ink-600 mt-2">
               {t('products.priceField')}: {p.price.toLocaleString()} {p.currency} · {t('products.cpaRateField')}:{' '}
               {p.cpaRate.toLocaleString()} {p.currency}

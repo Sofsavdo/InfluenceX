@@ -53,7 +53,9 @@ export default function CreatorAnalytics() {
           <h2 className="text-xs font-semibold uppercase tracking-wide text-ink-400 mb-2">
             {t('analytics.applicationsFunnel')}
           </h2>
-          <div className="grid grid-cols-4 gap-2 mb-3">
+          {/* 2026-07-14 (UX audit): grid-cols-4 320px ekranda 4 xonali sonlarni siqib
+              qo'yardi (~66px katak, ~46px matn joyi) - grid-cols-2 (2x2) ga o'tkazildi. */}
+          <div className="grid grid-cols-2 gap-2 mb-3">
             <MiniStat label={t('applicants.status.pending')} value={data.applications.pending} />
             <MiniStat label={t('applicants.status.accepted')} value={data.applications.accepted} />
             <MiniStat label={t('applicants.status.rejected')} value={data.applications.rejected} />

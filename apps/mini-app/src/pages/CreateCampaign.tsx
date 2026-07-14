@@ -5,7 +5,7 @@ import { Sparkles } from 'lucide-react';
 import { apiClient } from '../api/client';
 import { PageHeader } from '../components/ui/PageHeader';
 import { Card } from '../components/ui/Card';
-import { Input, Textarea, Select } from '../components/ui/Field';
+import { Label, Input, Textarea, Select, FormSection } from '../components/ui/Field';
 import { Button } from '../components/ui/Button';
 
 interface BriefResult {
@@ -40,6 +40,11 @@ export default function CreateCampaign() {
   const [cpaRate, setCpaRate] = useState('');
   const [landingUrl, setLandingUrl] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  // 2026-07-14 (UX audit): avval majburiy maydonlar bo'sh bo'lganda tugma shunchaki
+  // "kulrang" (disabled) bo'lardi - foydalanuvchi NIMA yetishmayotganini bilmasdi.
+  // Endi tugma doim bosiladigan, lekin bo'sh majburiy maydon bo'lsa xato matni +
+  // qizil ramka (invalid) ko'rsatiladi (Profile.tsx'dagi bilan bir xil naqsh).
+  const [formError, setFormError] = useState<string | null>(null);
 
   const isCpaModel = collaborationModel === 'CPA' || collaborationModel === 'HYBRID';
   const isBarterModel = collaborationModel === 'BARTER';
@@ -73,6 +78,11 @@ export default function CreateCampaign() {
   }
 
   async function submitCampaign() {
+    if (!title.trim() || !description.trim() || !budget || !deadline) {
+      setFormError(t('common.error') as string);
+      return;
+    }
+    setFormError(null);
     setSubmitting(true);
     try {
       await apiClient.post('/campaigns', {
@@ -130,103 +140,130 @@ export default function CreateCampaign() {
         </Button>
       </Card>
 
-      <Card className="space-y-3">
-        <Input
-          placeholder={t('createCampaign.titleField') as string}
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
-        <Textarea
-          rows={3}
-          placeholder={t('createCampaign.descriptionField') as string}
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
-        <Input
-          placeholder={t('createCampaign.objectiveField') as string}
-          value={objective}
-          onChange={(e) => setObjective(e.target.value)}
-        />
-
-        <div className="grid grid-cols-2 gap-2">
-          <Select value={contentType} onChange={(e) => setContentType(e.target.value)}>
-            {['REEL', 'STORY', 'POST', 'UGC_VIDEO', 'PRODUCT_REVIEW'].map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
-          </Select>
-          <Select value={collaborationModel} onChange={(e) => setCollaborationModel(e.target.value)}>
-            {['FIXED', 'BARTER', 'CPA', 'HYBRID'].map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
-          </Select>
-        </div>
-
-        {isBarterModel && (
-          <div className="rounded-xl border border-dashed border-ink-200 p-3">
-            <p className="text-xs text-ink-500">{t('createCampaign.barterHint')}</p>
+      <Card>
+        <FormSection title="Asosiy ma'lumotlar">
+          <div>
+            <Label>{t('createCampaign.titleField')}</Label>
+            <Input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              invalid={!title.trim() && Boolean(formError)}
+            />
           </div>
-        )}
-
-        {isPureCpaModel && (
-          <div className="rounded-xl border border-warning-dot/30 bg-warning-bg p-3">
-            <p className="text-xs text-warning-text">{t('createCampaign.pureCpaWarning')}</p>
-            <button
-              type="button"
-              onClick={() => setCollaborationModel('HYBRID')}
-              className="tap-scale mt-2 text-xs font-semibold text-warning-text underline"
-            >
-              {t('createCampaign.switchToHybrid')}
-            </button>
+          <div>
+            <Label>{t('createCampaign.descriptionField')}</Label>
+            <Textarea
+              rows={3}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              invalid={!description.trim() && Boolean(formError)}
+            />
           </div>
-        )}
+          <div>
+            <Label>{t('createCampaign.objectiveField')}</Label>
+            <Input value={objective} onChange={(e) => setObjective(e.target.value)} />
+          </div>
+        </FormSection>
+
+        <FormSection title="Kontent va hamkorlik">
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Label>Kontent turi</Label>
+              <Select value={contentType} onChange={(e) => setContentType(e.target.value)}>
+                {['REEL', 'STORY', 'POST', 'UGC_VIDEO', 'PRODUCT_REVIEW'].map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
+              </Select>
+            </div>
+            <div>
+              <Label>Hamkorlik modeli</Label>
+              <Select value={collaborationModel} onChange={(e) => setCollaborationModel(e.target.value)}>
+                {['FIXED', 'BARTER', 'CPA', 'HYBRID'].map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
+              </Select>
+            </div>
+          </div>
+
+          {isBarterModel && (
+            <div className="rounded-xl border border-dashed border-ink-200 p-3">
+              <p className="text-xs text-ink-500">{t('createCampaign.barterHint')}</p>
+            </div>
+          )}
+
+          {isPureCpaModel && (
+            <div className="rounded-xl border border-warning-dot/30 bg-warning-bg p-3">
+              <p className="text-xs text-warning-text">{t('createCampaign.pureCpaWarning')}</p>
+              <button
+                type="button"
+                onClick={() => setCollaborationModel('HYBRID')}
+                className="tap-scale mt-2 text-xs font-semibold text-warning-text underline"
+              >
+                {t('createCampaign.switchToHybrid')}
+              </button>
+            </div>
+          )}
+        </FormSection>
 
         {isCpaModel && (
-          <div className="rounded-xl border border-dashed border-ink-200 p-3 space-y-2">
-            <p className="text-xs text-ink-500">{t('createCampaign.cpaHint')}</p>
-            <Input
-              type="number"
-              placeholder={t('createCampaign.cpaRateField') as string}
-              value={cpaRate}
-              onChange={(e) => setCpaRate(e.target.value)}
-            />
-            <Input
-              type="url"
-              placeholder={t('createCampaign.landingUrlField') as string}
-              value={landingUrl}
-              onChange={(e) => setLandingUrl(e.target.value)}
-            />
-          </div>
+          <FormSection title="CPA sozlamalari" description={t('createCampaign.cpaHint') as string}>
+            <div>
+              <Label>{t('createCampaign.cpaRateField')}</Label>
+              <Input
+                inputMode="numeric"
+                type="number"
+                value={cpaRate}
+                onChange={(e) => setCpaRate(e.target.value)}
+              />
+            </div>
+            <div>
+              <Label>{t('createCampaign.landingUrlField')}</Label>
+              <Input type="url" value={landingUrl} onChange={(e) => setLandingUrl(e.target.value)} />
+            </div>
+          </FormSection>
         )}
 
-        <div className="grid grid-cols-2 gap-2">
-          <Input
-            type="number"
-            placeholder={t('home.budget') as string}
-            value={budget}
-            onChange={(e) => setBudget(e.target.value)}
-          />
-          <Input
-            type="number"
-            min={1}
-            placeholder={t('createCampaign.creatorsCount') as string}
-            value={creatorsCount}
-            onChange={(e) => setCreatorsCount(e.target.value)}
-          />
-        </div>
+        <FormSection title="Byudjet va muddat">
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Label>{t('home.budget')}</Label>
+              <Input
+                inputMode="numeric"
+                type="number"
+                value={budget}
+                onChange={(e) => setBudget(e.target.value)}
+                invalid={!budget && Boolean(formError)}
+              />
+            </div>
+            <div>
+              <Label>{t('createCampaign.creatorsCount')}</Label>
+              <Input
+                inputMode="numeric"
+                type="number"
+                min={1}
+                value={creatorsCount}
+                onChange={(e) => setCreatorsCount(e.target.value)}
+              />
+            </div>
+          </div>
+          <div>
+            <Label>{t('home.deadline')}</Label>
+            <Input
+              type="date"
+              value={deadline}
+              onChange={(e) => setDeadline(e.target.value)}
+              invalid={!deadline && Boolean(formError)}
+            />
+          </div>
+        </FormSection>
 
-        <Input type="date" value={deadline} onChange={(e) => setDeadline(e.target.value)} />
+        {formError && <p className="text-danger-text text-xs mb-3">{formError}</p>}
 
-        <Button
-          full
-          size="lg"
-          loading={submitting}
-          disabled={!title || !description || !budget || !deadline}
-          onClick={submitCampaign}
-        >
+        <Button full size="lg" loading={submitting} disabled={submitting} onClick={submitCampaign}>
           {t('createCampaign.submit')}
         </Button>
       </Card>

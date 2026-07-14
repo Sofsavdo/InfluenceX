@@ -69,6 +69,7 @@ export function DisputeForm({ escrowId, onDone, onCancel }: DisputeFormProps) {
         placeholder={t('dispute.reasonPlaceholder') as string}
         value={reason}
         onChange={(e) => setReason(e.target.value)}
+        invalid={reason.trim().length < 5 && Boolean(error)}
       />
 
       <input ref={fileInputRef} type="file" className="hidden" onChange={addEvidence} />

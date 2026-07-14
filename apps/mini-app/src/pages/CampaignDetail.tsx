@@ -100,7 +100,7 @@ export default function CampaignDetail() {
     <div className="p-4 pb-24">
       <PageHeader back title={campaign.title} />
 
-      <p className="text-sm text-ink-500 leading-relaxed -mt-3 mb-5">{campaign.description}</p>
+      <p className="text-sm text-ink-500 leading-relaxed -mt-3 mb-5 break-words">{campaign.description}</p>
 
       <Card className="grid grid-cols-2 gap-y-5 gap-x-3">
         <DetailStat

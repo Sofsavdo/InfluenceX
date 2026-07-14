@@ -90,7 +90,7 @@ export default function App() {
 
   return (
     <div className="h-full flex flex-col">
-      <main className="flex-1 overflow-y-auto">
+      <main className="flex-1 overflow-y-auto w-full max-w-lg mx-auto">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/campaigns/new" element={<CreateCampaign />} />
