@@ -22,6 +22,7 @@ import { PortfolioModule } from './portfolio/portfolio.module';
 import { EarningsModule } from './earnings/earnings.module';
 import { AnalyticsModule } from './analytics/analytics.module';
 import { ProductsModule } from './products/products.module';
+import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
@@ -52,6 +53,7 @@ import { ProductsModule } from './products/products.module';
     EarningsModule,
     AnalyticsModule,
     ProductsModule,
+    HealthModule,
   ],
   providers: [
     {
