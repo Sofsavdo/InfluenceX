@@ -7,6 +7,7 @@ import { StatCard } from '../components/ui/StatCard';
 import { CardSkeleton } from '../components/ui/Skeleton';
 import { EmptyState } from '../components/ui/EmptyState';
 import { Card } from '../components/ui/Card';
+import { useTelegramBackButton } from '../lib/telegramUI';
 
 interface TransactionRow {
   type: 'escrow' | 'conversion';
@@ -32,6 +33,8 @@ export default function Payments() {
   const { t } = useTranslation();
   const [summary, setSummary] = useState<PaymentsSummary | null>(null);
   const [loading, setLoading] = useState(true);
+
+  useTelegramBackButton();
 
   useEffect(() => {
     apiClient

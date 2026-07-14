@@ -19,7 +19,12 @@
     "chooseRole": "Siz kimsiz?",
     "creator": "Men kreatorman",
     "business": "Men biznesman",
-    "continue": "Davom etish"
+    "continue": "Davom etish",
+    "creatorFormTitle": "Kreator profilini to‘ldiring",
+    "creatorFormSubtitle": "Faqat ismingiz shart, qolganini keyin ham to‘ldirishingiz mumkin.",
+    "businessFormTitle": "Biznes profilini to‘ldiring",
+    "businessFormSubtitle": "Faqat kompaniya nomi shart, qolganini keyin ham to‘ldirishingiz mumkin.",
+    "back": "Orqaga"
   },
   "profile": {
     "editProfile": "Profilni tahrirlash",

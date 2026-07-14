@@ -5,6 +5,7 @@ import { apiClient } from '../api/client';
 import { PageHeader } from '../components/ui/PageHeader';
 import { StatCard } from '../components/ui/StatCard';
 import { CardSkeleton } from '../components/ui/Skeleton';
+import { useTelegramBackButton } from '../lib/telegramUI';
 
 interface CreatorAnalyticsData {
   applications: { total: number; accepted: number; rejected: number; pending: number; acceptanceRate: number };
@@ -15,7 +16,7 @@ interface CreatorAnalyticsData {
 
 function MiniStat({ label, value }: { label: string; value: React.ReactNode }) {
   return (
-    <div className="rounded-xl border border-ink-100 bg-white p-2.5 text-center shadow-card">
+    <div className="rounded-xl border border-ink-100 bg-surface p-2.5 text-center shadow-card">
       <div className="text-lg font-extrabold text-ink-900">{value}</div>
       <div className="text-[10px] text-ink-400 mt-0.5">{label}</div>
     </div>
@@ -29,6 +30,8 @@ export default function CreatorAnalytics() {
   const { t } = useTranslation();
   const [data, setData] = useState<CreatorAnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
+
+  useTelegramBackButton();
 
   useEffect(() => {
     apiClient

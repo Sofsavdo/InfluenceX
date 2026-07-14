@@ -23,9 +23,9 @@ export function CampaignCard({ campaign }: { campaign: CampaignDto }) {
     <Link to={`/campaigns/${campaign.id}`} className="block mb-3">
       <Card interactive>
         <div className="flex justify-between items-start gap-3">
-          <h3 className="font-semibold text-[15px] text-ink-900 leading-snug flex items-center gap-1.5">
+          <h3 className="min-w-0 flex-1 font-semibold text-[15px] text-ink-900 leading-snug flex items-center gap-1.5">
             {campaign.isFeatured && <Star size={14} className="text-warning-dot fill-warning-dot shrink-0" />}
-            {campaign.title}
+            <span className="truncate">{campaign.title}</span>
           </h3>
           <Badge tone="info" className="shrink-0">
             {CONTENT_TYPE_LABEL[campaign.contentType] ?? campaign.contentType}

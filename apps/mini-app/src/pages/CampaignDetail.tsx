@@ -9,6 +9,7 @@ import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Textarea } from '../components/ui/Field';
 import { Skeleton } from '../components/ui/Skeleton';
+import { useTelegramMainButton, useTelegramBackButton } from '../lib/telegramUI';
 
 type UserRole = 'CREATOR' | 'BUSINESS' | 'ADMIN' | 'MODERATOR';
 
@@ -82,6 +83,18 @@ export default function CampaignDetail() {
     }
   }
 
+  const isOwner = campaign != null && me?.role === 'BUSINESS' && me.businessProfile?.id === campaign.businessId;
+  const canApply = campaign != null && me?.role === 'CREATOR' && !isOwner && !applied;
+
+  useTelegramBackButton();
+  useTelegramMainButton({
+    text: t('home.apply') as string,
+    onClick: submitApplication,
+    visible: canApply,
+    disabled: submitting,
+    loading: submitting,
+  });
+
   if (!campaign) {
     return (
       <div className="p-4 pb-24">
@@ -92,9 +105,6 @@ export default function CampaignDetail() {
       </div>
     );
   }
-
-  const isOwner = me?.role === 'BUSINESS' && me.businessProfile?.id === campaign.businessId;
-  const canApply = me?.role === 'CREATOR' && !isOwner && !applied;
 
   return (
     <div className="p-4 pb-24">

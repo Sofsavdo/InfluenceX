@@ -130,7 +130,7 @@ export function ConversionsPanel({ applicationId, currency, isBusiness }: Conver
 
       <div className="space-y-2">
         {conversions.map((c) => (
-          <div key={c.id} className="rounded-lg border border-ink-100 bg-white px-3 py-2">
+          <div key={c.id} className="rounded-lg border border-ink-100 bg-surface px-3 py-2">
             <div className="flex justify-between items-center text-sm">
               <span className="text-ink-800">{t(`conversions.type.${c.type.toLowerCase()}`)}</span>
               <span className="font-semibold text-ink-900">{c.amount.toLocaleString()} {currency}</span>
@@ -180,7 +180,7 @@ export function ConversionsPanel({ applicationId, currency, isBusiness }: Conver
               {t('conversions.report')}
             </button>
           ) : (
-            <div className="rounded-lg border border-dashed border-ink-200 p-2.5 space-y-2 bg-white">
+            <div className="rounded-lg border border-dashed border-ink-200 p-2.5 space-y-2 bg-surface">
               <Select value={type} onChange={(e) => setType(e.target.value as ConversionType)}>
                 {Object.values(ConversionType).map((v) => (
                   <option key={v} value={v}>

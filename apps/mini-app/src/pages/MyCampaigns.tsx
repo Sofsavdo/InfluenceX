@@ -11,6 +11,8 @@ import { CardSkeleton } from '../components/ui/Skeleton';
 import { EmptyState } from '../components/ui/EmptyState';
 import { StatusBadge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
+import { ConfirmDialog } from '../components/ui/Modal';
+import { useToast } from '../components/ui/Toast';
 
 type CampaignWithCount = CampaignDto & { _count?: { applications: number } };
 
@@ -28,10 +30,12 @@ const NEXT_STATUS: Partial<Record<CampaignStatus, CampaignStatus>> = {
 // 2026-07-14: dizayn tizimi qo'llanildi - mantiq/API chaqiruvlari o'zgarmagan.
 export default function MyCampaigns() {
   const { t } = useTranslation();
+  const toast = useToast();
   const [campaigns, setCampaigns] = useState<CampaignWithCount[]>([]);
   const [loading, setLoading] = useState(true);
   const [actingId, setActingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [confirmTarget, setConfirmTarget] = useState<string | null>(null);
 
   function load() {
     setLoading(true);
@@ -49,17 +53,21 @@ export default function MyCampaigns() {
     setError(null);
     try {
       await apiClient.patch(`/campaigns/${campaignId}/status`, { status: nextStatus });
+      const successKey =
+        nextStatus === CampaignStatus.CANCELLED ? 'myCampaigns.cancel' : `myCampaigns.advanceTo.${nextStatus.toLowerCase()}`;
+      toast.success(t(successKey) as string);
       load();
     } catch (e) {
       setError((e as Error).message);
+      toast.error((e as Error).message);
     } finally {
       setActingId(null);
     }
   }
 
   async function cancel(campaignId: string) {
-    if (!window.confirm(t('myCampaigns.cancelConfirm') as string)) return;
     await advance(campaignId, CampaignStatus.CANCELLED);
+    setConfirmTarget(null);
   }
 
   async function feature(campaignId: string) {
@@ -67,9 +75,11 @@ export default function MyCampaigns() {
     setError(null);
     try {
       await apiClient.post(`/campaigns/${campaignId}/feature`, { days: 7 });
+      toast.success(t('myCampaigns.feature') as string);
       load();
     } catch (e) {
       setError((e as Error).message);
+      toast.error((e as Error).message);
     } finally {
       setActingId(null);
     }
@@ -117,7 +127,7 @@ export default function MyCampaigns() {
           return (
             <Card key={c.id}>
               <div className="flex justify-between items-start gap-2">
-                <Link to={`/campaigns/${c.id}`} className="font-semibold text-ink-900 text-[15px]">
+                <Link to={`/campaigns/${c.id}`} className="min-w-0 flex-1 truncate font-semibold text-ink-900 text-[15px]">
                   {c.title}
                 </Link>
                 <StatusBadge status={c.status} />
@@ -139,7 +149,7 @@ export default function MyCampaigns() {
                   </Button>
                 )}
                 {c.status !== CampaignStatus.COMPLETED && c.status !== CampaignStatus.CANCELLED && (
-                  <Button size="sm" variant="secondary" disabled={actingId === c.id} onClick={() => cancel(c.id)}>
+                  <Button size="sm" variant="secondary" disabled={actingId === c.id} onClick={() => setConfirmTarget(c.id)}>
                     {t('myCampaigns.cancel')}
                   </Button>
                 )}
@@ -164,6 +174,18 @@ export default function MyCampaigns() {
           );
         })}
       </div>
+
+      <ConfirmDialog
+        open={!!confirmTarget}
+        onClose={() => setConfirmTarget(null)}
+        onConfirm={() => confirmTarget && cancel(confirmTarget)}
+        title={t('myCampaigns.cancel') as string}
+        description={t('myCampaigns.cancelConfirm') as string}
+        confirmLabel={t('myCampaigns.cancel') as string}
+        cancelLabel={t('common.cancel') as string}
+        tone="danger"
+        loading={actingId === confirmTarget}
+      />
     </div>
   );
 }

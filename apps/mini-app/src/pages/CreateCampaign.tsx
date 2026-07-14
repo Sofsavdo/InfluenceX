@@ -7,6 +7,7 @@ import { PageHeader } from '../components/ui/PageHeader';
 import { Card } from '../components/ui/Card';
 import { Label, Input, Textarea, Select, FormSection } from '../components/ui/Field';
 import { Button } from '../components/ui/Button';
+import { useTelegramMainButton, useTelegramBackButton } from '../lib/telegramUI';
 
 interface BriefResult {
   title: string;
@@ -108,6 +109,14 @@ export default function CreateCampaign() {
       setSubmitting(false);
     }
   }
+
+  useTelegramBackButton();
+  useTelegramMainButton({
+    text: t('createCampaign.submit') as string,
+    onClick: submitCampaign,
+    disabled: submitting,
+    loading: submitting,
+  });
 
   return (
     <div className="p-4 pb-24">

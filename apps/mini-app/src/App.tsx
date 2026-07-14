@@ -70,7 +70,7 @@ function useOnboardingGate() {
 
 function SplashScreen() {
   return (
-    <div className="flex h-full flex-col items-center justify-center gap-3 bg-gradient-to-b from-accent-50 to-white">
+    <div className="flex h-full flex-col items-center justify-center gap-3 bg-canvas">
       <div className="h-12 w-12 rounded-2xl bg-accent-500 shadow-pop flex items-center justify-center text-white animate-pulse">
         <Sparkles size={22} />
       </div>
@@ -89,7 +89,7 @@ export default function App() {
   }
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col bg-canvas">
       <main className="flex-1 overflow-y-auto w-full max-w-lg mx-auto">
         <Routes>
           <Route path="/" element={<Home />} />

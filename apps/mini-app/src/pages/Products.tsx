@@ -10,6 +10,9 @@ import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
 import { CardSkeleton } from '../components/ui/Skeleton';
 import { EmptyState } from '../components/ui/EmptyState';
+import { useTelegramBackButton } from '../lib/telegramUI';
+import { ConfirmDialog } from '../components/ui/Modal';
+import { useToast } from '../components/ui/Toast';
 
 interface ProductItem {
   id: string;
@@ -35,11 +38,13 @@ const CONTENT_TYPES = ['REEL', 'STORY', 'POST', 'UGC_VIDEO', 'PRODUCT_REVIEW'];
 // 2026-07-14: dizayn tizimi qo'llanildi - mantiq/API chaqiruvlari o'zgarmagan.
 export default function Products() {
   const { t } = useTranslation();
+  const toast = useToast();
   const [products, setProducts] = useState<ProductItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [savingId, setSavingId] = useState<string | null>(null);
+  const [confirmTarget, setConfirmTarget] = useState<ProductItem | null>(null);
 
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -49,6 +54,8 @@ export default function Products() {
   const [contentType, setContentType] = useState('REEL');
   const [creating, setCreating] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+
+  useTelegramBackButton();
 
   function load() {
     setLoading(true);
@@ -80,9 +87,11 @@ export default function Products() {
       setCpaRate('');
       setContentType('REEL');
       setShowForm(false);
+      toast.success("Mahsulot qo'shildi");
       load();
     } catch (e) {
       setFormError((e as Error).message);
+      toast.error((e as Error).message);
     } finally {
       setCreating(false);
     }
@@ -93,25 +102,29 @@ export default function Products() {
     setError(null);
     try {
       await apiClient.patch(`/products/${product.id}/visibility`, { visible: !product.visibleToCreators });
+      toast.success(product.visibleToCreators ? "Mahsulot yashirildi" : "Mahsulot blogerlarga ko'rsatildi");
       load();
     } catch (e) {
       setError((e as Error).message);
+      toast.error((e as Error).message);
     } finally {
       setSavingId(null);
     }
   }
 
   async function remove(product: ProductItem) {
-    if (!window.confirm(t('products.deleteConfirm') as string)) return;
     setSavingId(product.id);
     setError(null);
     try {
       await apiClient.delete(`/products/${product.id}`);
+      toast.success("Mahsulot o'chirildi");
       load();
     } catch (e) {
       setError((e as Error).message);
+      toast.error((e as Error).message);
     } finally {
       setSavingId(null);
+      setConfirmTarget(null);
     }
   }
 
@@ -226,7 +239,7 @@ export default function Products() {
                 variant="danger"
                 icon={<Trash2 size={13} />}
                 disabled={savingId === p.id}
-                onClick={() => remove(p)}
+                onClick={() => setConfirmTarget(p)}
               >
                 {t('common.delete')}
               </Button>
@@ -234,6 +247,18 @@ export default function Products() {
           </Card>
         ))}
       </div>
+
+      <ConfirmDialog
+        open={!!confirmTarget}
+        onClose={() => setConfirmTarget(null)}
+        onConfirm={() => confirmTarget && remove(confirmTarget)}
+        title={t('common.delete') as string}
+        description={t('products.deleteConfirm') as string}
+        confirmLabel={t('common.delete') as string}
+        cancelLabel={t('common.cancel') as string}
+        tone="danger"
+        loading={savingId === confirmTarget?.id}
+      />
     </div>
   );
 }

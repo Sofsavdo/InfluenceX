@@ -8,6 +8,9 @@ import { Input } from '../components/ui/Field';
 import { Button } from '../components/ui/Button';
 import { EmptyState } from '../components/ui/EmptyState';
 import { Skeleton } from '../components/ui/Skeleton';
+import { useTelegramBackButton } from '../lib/telegramUI';
+import { ConfirmDialog } from '../components/ui/Modal';
+import { useToast } from '../components/ui/Toast';
 
 interface PortfolioItem {
   id: string;
@@ -26,13 +29,17 @@ function isVideo(url: string) {
 // 2026-07-14: dizayn tizimi qo'llanildi - mantiq/API chaqiruvlari o'zgarmagan.
 export default function Portfolio() {
   const { t } = useTranslation();
+  const toast = useToast();
   const [items, setItems] = useState<PortfolioItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [caption, setCaption] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [confirmTarget, setConfirmTarget] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useTelegramBackButton();
 
   function load() {
     setLoading(true);
@@ -55,25 +62,29 @@ export default function Portfolio() {
       const mediaUrl = await uploadFile(file, 'portfolio');
       await apiClient.post('/portfolio', { mediaUrl, caption: caption || undefined });
       setCaption('');
+      toast.success("Namuna qo'shildi");
       load();
     } catch (err) {
       setError((err as Error).message);
+      toast.error((err as Error).message);
     } finally {
       setUploading(false);
     }
   }
 
   async function remove(id: string) {
-    if (!window.confirm(t('portfolio.deleteConfirm') as string)) return;
     setDeletingId(id);
     setError(null);
     try {
       await apiClient.delete(`/portfolio/${id}`);
+      toast.success("Namuna o'chirildi");
       load();
     } catch (err) {
       setError((err as Error).message);
+      toast.error((err as Error).message);
     } finally {
       setDeletingId(null);
+      setConfirmTarget(null);
     }
   }
 
@@ -113,7 +124,7 @@ export default function Portfolio() {
 
       <div className="grid grid-cols-2 gap-3">
         {items.map((item) => (
-          <div key={item.id} className="rounded-2xl border border-ink-100 overflow-hidden bg-white shadow-card">
+          <div key={item.id} className="rounded-2xl border border-ink-100 overflow-hidden bg-surface shadow-card">
             {isVideo(item.mediaUrl) ? (
               <video src={item.mediaUrl} className="w-full aspect-square object-cover" controls />
             ) : (
@@ -122,7 +133,7 @@ export default function Portfolio() {
             <div className="p-2.5">
               {item.caption && <p className="text-xs text-ink-600 truncate">{item.caption}</p>}
               <button
-                onClick={() => remove(item.id)}
+                onClick={() => setConfirmTarget(item.id)}
                 disabled={deletingId === item.id}
                 className="tap-scale text-danger-text text-xs mt-1.5 disabled:opacity-50 inline-flex items-center gap-1"
               >
@@ -133,6 +144,18 @@ export default function Portfolio() {
           </div>
         ))}
       </div>
+
+      <ConfirmDialog
+        open={!!confirmTarget}
+        onClose={() => setConfirmTarget(null)}
+        onConfirm={() => confirmTarget && remove(confirmTarget)}
+        title={t('common.delete') as string}
+        description={t('portfolio.deleteConfirm') as string}
+        confirmLabel={t('common.delete') as string}
+        cancelLabel={t('common.cancel') as string}
+        tone="danger"
+        loading={deletingId === confirmTarget}
+      />
     </div>
   );
 }

@@ -112,7 +112,7 @@ export default function Applications() {
       {applications.map((app) => (
         <Card key={app.id} className="mb-3">
           <div className="flex justify-between items-center gap-2">
-            <span className="font-semibold text-ink-900 text-[15px]">{app.campaign?.title ?? app.campaignId}</span>
+            <span className="min-w-0 flex-1 truncate font-semibold text-ink-900 text-[15px]">{app.campaign?.title ?? app.campaignId}</span>
             <StatusBadge status={app.status} />
           </div>
           {app.escrow && (

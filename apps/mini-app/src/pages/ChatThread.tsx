@@ -7,6 +7,7 @@ import { getChatSocket } from '../lib/socket';
 import { uploadFile } from '../lib/upload';
 import { PageHeader } from '../components/ui/PageHeader';
 import { Skeleton } from '../components/ui/Skeleton';
+import { useTelegramBackButton } from '../lib/telegramUI';
 
 interface ChatMessage {
   id: string;
@@ -97,6 +98,8 @@ export default function ChatThread() {
     }
   }
 
+  useTelegramBackButton();
+
   if (loading) {
     return (
       <div className="p-4 pb-24">
@@ -147,13 +150,13 @@ export default function ChatThread() {
         <button
           onClick={() => fileInputRef.current?.click()}
           disabled={uploadingFile}
-          className="tap-scale h-[42px] w-[42px] shrink-0 rounded-xl border border-ink-200 flex items-center justify-center text-ink-500 disabled:opacity-50"
+          className="tap-scale h-11 w-11 shrink-0 rounded-xl border border-ink-200 flex items-center justify-center text-ink-500 disabled:opacity-50"
           title={t('chat.attach') as string}
         >
           {uploadingFile ? <Loader2 size={16} className="animate-spin" /> : <Paperclip size={16} />}
         </button>
         <input
-          className="flex-1 rounded-xl border border-ink-200 bg-white px-3.5 py-2.5 text-sm text-ink-900 placeholder:text-ink-300 outline-none transition-shadow focus:border-accent-400 focus:ring-4 focus:ring-accent-100"
+          className="flex-1 rounded-xl border border-ink-200 bg-surface px-3.5 py-2.5 text-sm text-ink-900 placeholder:text-ink-300 outline-none transition-shadow focus:border-accent-400 focus:ring-4 focus:ring-accent-100"
           value={text}
           onChange={(e) => setText(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && send()}
@@ -161,7 +164,7 @@ export default function ChatThread() {
         />
         <button
           onClick={send}
-          className="tap-scale h-[42px] w-[42px] shrink-0 rounded-xl bg-accent-500 text-white flex items-center justify-center hover:bg-accent-600"
+          className="tap-scale h-11 w-11 shrink-0 rounded-xl bg-accent-500 text-white flex items-center justify-center hover:bg-accent-600"
           aria-label={t('common.send') as string}
         >
           <Send size={16} />

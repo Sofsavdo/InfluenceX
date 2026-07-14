@@ -19,7 +19,12 @@
     "chooseRole": "Who are you?",
     "creator": "I'm a creator",
     "business": "I'm a business",
-    "continue": "Continue"
+    "continue": "Continue",
+    "creatorFormTitle": "Set up your creator profile",
+    "creatorFormSubtitle": "Only your name is required — you can fill in the rest later.",
+    "businessFormTitle": "Set up your business profile",
+    "businessFormSubtitle": "Only the company name is required — you can fill in the rest later.",
+    "back": "Back"
   },
   "profile": {
     "editProfile": "Edit profile",

@@ -22,7 +22,7 @@ export function LanguageSwitcher({ value, onChange }: { value: string; onChange:
             type="button"
             onClick={() => onChange(lng.code)}
             className={`tap-scale w-full flex items-center gap-3 rounded-xl border px-3.5 py-3 text-left transition-colors ${
-              active ? 'border-accent-500 bg-accent-50' : 'border-ink-200 bg-white'
+              active ? 'border-accent-500 bg-accent-50' : 'border-ink-200 bg-surface'
             }`}
           >
             <span className="text-2xl leading-none">{lng.flag}</span>
@@ -63,7 +63,7 @@ export function LanguageMultiSelect({
             type="button"
             onClick={() => onToggle(lng.code)}
             className={`tap-scale w-full flex items-center gap-3 rounded-xl border px-3.5 py-3 text-left transition-colors ${
-              active ? 'border-accent-500 bg-accent-50' : 'border-ink-200 bg-white'
+              active ? 'border-accent-500 bg-accent-50' : 'border-ink-200 bg-surface'
             }`}
           >
             <span className="text-xl leading-none">{lng.flag}</span>

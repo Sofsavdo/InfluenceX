@@ -14,7 +14,7 @@ export function StatCard({
   return (
     <div
       className={`rounded-2xl p-4 border shadow-card ${
-        tone === 'accent' ? 'bg-accent-500 border-accent-500 text-white' : 'bg-white border-ink-100 text-ink-900'
+        tone === 'accent' ? 'bg-accent-500 border-accent-500 text-white' : 'bg-surface border-ink-100 text-ink-900'
       }`}
     >
       <div className="flex items-center justify-between mb-2">

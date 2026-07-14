@@ -14,6 +14,9 @@ import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
 import { CardSkeleton } from '../components/ui/Skeleton';
 import { EmptyState } from '../components/ui/EmptyState';
+import { ConfirmDialog } from '../components/ui/Modal';
+import { useToast } from '../components/ui/Toast';
+import { useTelegramBackButton } from '../lib/telegramUI';
 
 type ApplicationWithCreator = ApplicationDto & { creator: CreatorProfileDto; escrow?: EscrowDto | null };
 
@@ -50,6 +53,7 @@ interface DepositIntentResult {
 export default function CampaignApplicants() {
   const { id } = useParams();
   const { t } = useTranslation();
+  const toast = useToast();
   const [campaign, setCampaign] = useState<CampaignDto | null>(null);
   const [applications, setApplications] = useState<ApplicationWithCreator[]>([]);
   const [pricing, setPricing] = useState<Record<string, PricingRecommendation>>({});
@@ -60,6 +64,9 @@ export default function CampaignApplicants() {
   const [depositCheckoutUrls, setDepositCheckoutUrls] = useState<Record<string, string>>({});
   const [disputeForEscrowId, setDisputeForEscrowId] = useState<string | null>(null);
   const [portfolios, setPortfolios] = useState<Record<string, { mediaUrl: string }[]>>({});
+  const [confirmTarget, setConfirmTarget] = useState<string | null>(null);
+
+  useTelegramBackButton();
 
   function load() {
     if (!id) return;
@@ -120,9 +127,11 @@ export default function CampaignApplicants() {
     setError(null);
     try {
       await apiClient.patch(`/applications/${applicationId}/status`, { status });
+      toast.success(t(`applicants.status.${status.toLowerCase()}`) as string);
       load();
     } catch (e) {
       setError((e as Error).message);
+      toast.error((e as Error).message);
     } finally {
       setActingId(null);
     }
@@ -142,6 +151,7 @@ export default function CampaignApplicants() {
       window.open(result.checkoutUrl, '_blank');
     } catch (e) {
       setError((e as Error).message);
+      toast.error((e as Error).message);
     } finally {
       setActingId(null);
     }
@@ -152,25 +162,29 @@ export default function CampaignApplicants() {
     setError(null);
     try {
       await apiClient.post(`/escrow/${escrowId}/release`);
+      toast.success(t('applicants.approveAndRelease') as string);
       load();
     } catch (e) {
       setError((e as Error).message);
+      toast.error((e as Error).message);
     } finally {
       setActingId(null);
     }
   }
 
   async function refund(escrowId: string) {
-    if (!window.confirm(t('applicants.refundConfirm') as string)) return;
     setActingId(escrowId);
     setError(null);
     try {
       await apiClient.post(`/escrow/${escrowId}/refund`);
+      toast.success(t('applicants.refund') as string);
       load();
     } catch (e) {
       setError((e as Error).message);
+      toast.error((e as Error).message);
     } finally {
       setActingId(null);
+      setConfirmTarget(null);
     }
   }
 
@@ -200,8 +214,8 @@ export default function CampaignApplicants() {
           return (
             <Card key={app.id}>
               <div className="flex justify-between items-start gap-2">
-                <div>
-                  <p className="font-semibold text-ink-900 text-[15px]">{app.creator.name}</p>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-semibold text-ink-900 text-[15px]">{app.creator.name}</p>
                   <p className="text-xs text-ink-400 mt-0.5">
                     {app.creator.followers.toLocaleString()} {t('applicants.followers')} ·{' '}
                     {t('applicants.rating')}: {app.creator.rating.toFixed(1)} · {app.creator.tier}
@@ -317,7 +331,7 @@ export default function CampaignApplicants() {
                       variant="secondary"
                       className="mt-2"
                       loading={actingId === escrow.id}
-                      onClick={() => refund(escrow.id)}
+                      onClick={() => setConfirmTarget(escrow.id)}
                     >
                       {t('applicants.refund')}
                     </Button>
@@ -389,6 +403,18 @@ export default function CampaignApplicants() {
           </div>
         </div>
       )}
+
+      <ConfirmDialog
+        open={!!confirmTarget}
+        onClose={() => setConfirmTarget(null)}
+        onConfirm={() => confirmTarget && refund(confirmTarget)}
+        title={t('applicants.refund') as string}
+        description={t('applicants.refundConfirm') as string}
+        confirmLabel={t('applicants.refund') as string}
+        cancelLabel={t('common.cancel') as string}
+        tone="danger"
+        loading={actingId === confirmTarget}
+      />
     </div>
   );
 }

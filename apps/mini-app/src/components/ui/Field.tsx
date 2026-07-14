@@ -23,7 +23,7 @@ export function Label({
 // oxirida bo'lgani uchun uzun formalarda foydalanuvchi qaysi maydon xato ekanini
 // darhol bilmasdi).
 const fieldBase =
-  'w-full min-h-[46px] rounded-xl border bg-white px-3.5 text-[15px] text-ink-900 placeholder:text-ink-300 outline-none transition-shadow disabled:bg-ink-50 disabled:text-ink-400';
+  'w-full min-h-[46px] rounded-xl border bg-surface px-3.5 text-[15px] text-ink-900 placeholder:text-ink-300 outline-none transition-shadow disabled:bg-ink-50 disabled:text-ink-400';
 const fieldOk = 'border-ink-200 focus:border-accent-400 focus:ring-4 focus:ring-accent-100';
 const fieldError = 'border-danger-dot focus:border-danger-dot focus:ring-4 focus:ring-danger-bg';
 
@@ -84,7 +84,7 @@ export function FormSection({
 // ekran tagiga yopishgan panel (Telegram xavfsiz zonasini hisobga oladi).
 export function StickyActionBar({ children }: { children: ReactNode }) {
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-20 border-t border-ink-100 bg-white/95 backdrop-blur px-4 pt-3 pb-[calc(env(safe-area-inset-bottom)+12px)] max-w-lg mx-auto">
+    <div className="fixed bottom-0 left-0 right-0 z-20 border-t border-ink-100 bg-surface/95 backdrop-blur px-4 pt-3 pb-[calc(env(safe-area-inset-bottom)+12px)] max-w-lg mx-auto">
       {children}
     </div>
   );

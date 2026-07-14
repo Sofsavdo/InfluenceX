@@ -4,6 +4,83 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * 2026-07-14 Dizayn tizimi v2 — rang tokenlari.
+ * Har bir token bitta joyda e'lon qilinadi (:root = light, .dark = dark).
+ * tailwind.config.js'dagi colors.* shu o'zgaruvchilarga ishora qiladi, shuning
+ * uchun mavjud sahifalardagi "text-ink-900", "bg-surface" kabi klasslar HECH
+ * QANDAY o'zgarishsiz ikkala rejimda ham to'g'ri ko'rinadi.
+ */
+:root {
+  --surface: #ffffff;
+  --canvas: #ffffff;
+  --overlay: rgba(15, 16, 20, 0.44);
+
+  --accent-50: #eef4ff;
+  --accent-100: #dce8ff;
+  --accent-200: #b9d1ff;
+  --accent-300: #8bb2ff;
+  --accent-400: #5c8eff;
+  --accent-500: #3366ff;
+  --accent-600: #254deb;
+  --accent-700: #1c3bc7;
+  --accent-800: #1a329e;
+  --accent-900: #1a2f7d;
+
+  --ink-50: #f7f7f8;
+  --ink-100: #eeeef0;
+  --ink-200: #d9d9de;
+  --ink-300: #b8b9c1;
+  --ink-400: #91929e;
+  --ink-500: #71727e;
+  --ink-600: #585a66;
+  --ink-700: #454651;
+  --ink-800: #2e2f38;
+  --ink-900: #191a20;
+
+  --success-bg: #e8f7ee; --success-text: #0f8a3c; --success-dot: #22c55e;
+  --warning-bg: #fff6e5; --warning-text: #a65f00; --warning-dot: #f59e0b;
+  --danger-bg: #fdeced;  --danger-text: #c81e3a;  --danger-dot: #ef4444;
+  --info-bg: #eef4ff;    --info-text: #2354d6;    --info-dot: #3366ff;
+
+  color-scheme: light;
+}
+
+.dark {
+  --surface: #1c1c1f;
+  --canvas: #0f0f11;
+  --overlay: rgba(0, 0, 0, 0.6);
+
+  --accent-50: #16233d;
+  --accent-100: #1c2c4d;
+  --accent-200: #24386a;
+  --accent-300: #33499a;
+  --accent-400: #4d7bff;
+  --accent-500: #5c8eff;
+  --accent-600: #7ea3ff;
+  --accent-700: #a8c1ff;
+  --accent-800: #cddaff;
+  --accent-900: #eaf0ff;
+
+  --ink-50: #19191d;
+  --ink-100: #232328;
+  --ink-200: #34343b;
+  --ink-300: #4a4a53;
+  --ink-400: #86868f;
+  --ink-500: #9a9aa5;
+  --ink-600: #b4b4bd;
+  --ink-700: #c9c9d1;
+  --ink-800: #e2e2e6;
+  --ink-900: #f6f6f8;
+
+  --success-bg: #103322; --success-text: #4ade80; --success-dot: #22c55e;
+  --warning-bg: #362707; --warning-text: #fbbf24; --warning-dot: #f59e0b;
+  --danger-bg: #341419;  --danger-text: #fb7185;  --danger-dot: #ef4444;
+  --info-bg: #16233d;    --info-text: #86a9ff;    --info-dot: #5c8eff;
+
+  color-scheme: dark;
+}
+
 html, body, #root {
   height: 100%;
 }
@@ -12,6 +89,8 @@ body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: transparent;
+  background-color: var(--canvas);
+  transition: background-color 0.15s ease;
 }
 
 * {
@@ -23,7 +102,7 @@ body {
   height: 6px;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--tg-theme-hint-color, #d9d9de);
+  background: var(--ink-200);
   border-radius: 999px;
 }
 
@@ -33,4 +112,12 @@ body {
 .tap-scale:active {
   transform: scale(0.97);
   opacity: 0.9;
+}
+
+/* Telegram xavfsiz zonasi (notch / gesture bar) - pastki fixed elementlar uchun */
+.safe-b {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.safe-t {
+  padding-top: env(safe-area-inset-top, 0px);
 }

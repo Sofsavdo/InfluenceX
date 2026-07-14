@@ -21,9 +21,9 @@ interface SidebarProps {
 }
 
 // PRD v1 Admin Panel moduli: Users, Campaigns, Payments/Escrow, Disputes, Verification
-// Requests, Fraud Reports. 2026-07-11: mobil ekranlar uchun responsiv qilindi - kichik
-// ekranda sidebar ekrandan tashqarida yashiringan, hamburger tugmasi bilan slide-in
-// (backdrop bilan), md+ ekranda esa doimiy ko'rinadigan statik panel.
+// Requests, Fraud Reports. 2026-07-11: mobil ekranlar uchun responsiv qilindi.
+// 2026-07-14: brend rangi (accent) mini-app dizayn tizimi bilan bir xillashtirildi -
+// avvalgi qora/kulrang (gray-900) faol holat endi accent-500 bo'ladi.
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
@@ -33,30 +33,37 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       {isOpen && (
         <div
           onClick={onClose}
-          className="fixed inset-0 z-30 bg-black/40 md:hidden"
+          className="fixed inset-0 z-30 bg-ink-900/40 md:hidden"
           aria-hidden="true"
         />
       )}
       <aside
-        className={`fixed inset-y-0 left-0 z-40 w-64 shrink-0 border-r border-gray-200 bg-white
+        className={`fixed inset-y-0 left-0 z-40 w-64 shrink-0 border-r border-ink-100 bg-white
           flex flex-col transition-transform duration-200 ease-in-out
-          md:sticky md:top-0 md:h-screen md:w-56 md:translate-x-0
+          md:sticky md:top-0 md:h-screen md:w-60 md:translate-x-0
           ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
       >
-        <div className="p-4 font-bold text-lg border-b border-gray-200 flex items-center justify-between">
-          InfluenceX Admin
-          <button onClick={onClose} className="md:hidden text-gray-400 hover:text-gray-700" aria-label="Yopish">
+        <div className="p-4 border-b border-ink-100 flex items-center justify-between">
+          <span className="flex items-center gap-2 font-extrabold text-[15px] tracking-tight text-ink-900">
+            <span className="h-7 w-7 rounded-lg bg-accent-500 flex items-center justify-center text-white text-xs font-bold">
+              IX
+            </span>
+            InfluenceX Admin
+          </span>
+          <button onClick={onClose} className="md:hidden text-ink-400 hover:text-ink-700" aria-label="Yopish">
             ✕
           </button>
         </div>
-        <nav className="flex-1 p-2 overflow-y-auto">
+        <nav className="flex-1 p-2 overflow-y-auto space-y-0.5">
           {links.map((link) => (
             <Link
               key={link.href}
               href={link.href}
               onClick={onClose}
-              className={`block rounded-lg px-3 py-2 text-sm mb-1 ${
-                pathname === link.href ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-100'
+              className={`block rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
+                pathname === link.href
+                  ? 'bg-accent-50 text-accent-700'
+                  : 'text-ink-600 hover:bg-ink-50 hover:text-ink-900'
               }`}
             >
               {link.label}
@@ -68,7 +75,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             clearToken();
             router.push('/login');
           }}
-          className="m-2 rounded-lg px-3 py-2 text-sm text-left text-red-600 hover:bg-red-50"
+          className="m-2 rounded-xl px-3 py-2.5 text-sm font-medium text-left text-red-600 hover:bg-red-50"
         >
           Chiqish
         </button>

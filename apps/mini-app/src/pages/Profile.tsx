@@ -29,6 +29,7 @@ import { StatCard } from '../components/ui/StatCard';
 import { Label, Input, Textarea, FormSection, StickyActionBar } from '../components/ui/Field';
 import { LanguageSwitcher, LanguageMultiSelect } from '../components/ui/LanguageSwitcher';
 import { Skeleton } from '../components/ui/Skeleton';
+import { haptic, hapticNotify } from '../lib/telegramUI';
 
 interface PricingRecommendation {
   currency: 'UZS';
@@ -243,9 +244,11 @@ export default function Profile() {
         payoutAccount: payoutAccount || undefined,
       });
       setEditingCreator(false);
+      hapticNotify('success');
       load();
     } catch (err) {
       setCreatorInfoError((err as Error).message);
+      hapticNotify('error');
     } finally {
       setSavingCreatorInfo(false);
     }
@@ -267,9 +270,11 @@ export default function Profile() {
         contactPerson: bizContactPerson.trim() || undefined,
       });
       setEditingBusiness(false);
+      hapticNotify('success');
       load();
     } catch (err) {
       setBusinessInfoError((err as Error).message);
+      hapticNotify('error');
     } finally {
       setSavingBusinessInfo(false);
     }
@@ -287,7 +292,11 @@ export default function Profile() {
         payoutAccount,
       });
       setPayoutSaved(true);
+      hapticNotify('success');
       setTimeout(() => setPayoutSaved(false), 2000);
+    } catch (err) {
+      hapticNotify('error');
+      throw err;
     } finally {
       setSavingPayout(false);
     }
@@ -399,11 +408,7 @@ export default function Profile() {
           className="tap-scale relative shrink-0 disabled:opacity-50"
           aria-label={t('profile.changePhoto') as string}
         >
-          {photoUrl ? (
-            <img src={photoUrl} alt="" className="w-16 h-16 rounded-full object-cover" />
-          ) : (
-            <Avatar name={displayName} size={64} />
-          )}
+          <Avatar name={displayName} src={photoUrl} size={64} />
           <span className="absolute -bottom-0.5 -right-0.5 h-6 w-6 rounded-full bg-accent-500 text-white flex items-center justify-center border-2 border-white">
             <Camera size={12} />
           </span>
@@ -421,7 +426,13 @@ export default function Profile() {
       <Card>
         <SectionTitle icon={<Globe size={16} className="text-accent-500" />}>Til / Язык / Language</SectionTitle>
         <p className="text-xs text-ink-400 mb-3">Ilova interfeysi tili / Язык интерфейса / Interface language</p>
-        <LanguageSwitcher value={i18n.language} onChange={(code) => i18n.changeLanguage(code)} />
+        <LanguageSwitcher
+          value={i18n.language}
+          onChange={(code) => {
+            haptic('light');
+            i18n.changeLanguage(code);
+          }}
+        />
       </Card>
 
       {me.creatorProfile && (
@@ -432,7 +443,10 @@ export default function Profile() {
                 {me.creatorProfile.name || t('profile.nameMissing')}
               </h2>
               <button
-                onClick={() => setEditingCreator((v) => !v)}
+                onClick={() => {
+                  haptic('light');
+                  setEditingCreator((v) => !v);
+                }}
                 className="tap-scale text-xs font-medium text-accent-600 shrink-0 inline-flex items-center gap-1"
               >
                 {editingCreator ? t('common.cancel') : (
@@ -629,7 +643,10 @@ export default function Profile() {
               {me.businessProfile.companyName || t('profile.nameMissing')}
             </h2>
             <button
-              onClick={() => setEditingBusiness((v) => !v)}
+              onClick={() => {
+                haptic('light');
+                setEditingBusiness((v) => !v);
+              }}
               className="tap-scale text-xs font-medium text-accent-600 shrink-0 inline-flex items-center gap-1"
             >
               {editingBusiness ? t('common.cancel') : (

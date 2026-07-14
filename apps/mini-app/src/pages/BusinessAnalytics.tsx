@@ -4,6 +4,7 @@ import { apiClient } from '../api/client';
 import { PageHeader } from '../components/ui/PageHeader';
 import { Card } from '../components/ui/Card';
 import { CardSkeleton } from '../components/ui/Skeleton';
+import { useTelegramBackButton } from '../lib/telegramUI';
 
 interface BusinessAnalyticsData {
   campaignsByStatus: Record<string, number>;
@@ -14,7 +15,7 @@ interface BusinessAnalyticsData {
 
 function MiniStat({ label, value }: { label: string; value: React.ReactNode }) {
   return (
-    <div className="rounded-xl border border-ink-100 bg-white p-2.5 text-center shadow-card">
+    <div className="rounded-xl border border-ink-100 bg-surface p-2.5 text-center shadow-card">
       <div className="text-lg font-extrabold text-ink-900">{value}</div>
       <div className="text-[10px] text-ink-400 mt-0.5">{label}</div>
     </div>
@@ -28,6 +29,8 @@ export default function BusinessAnalytics() {
   const { t } = useTranslation();
   const [data, setData] = useState<BusinessAnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
+
+  useTelegramBackButton();
 
   useEffect(() => {
     apiClient
