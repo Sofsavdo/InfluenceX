@@ -32,19 +32,21 @@ interface MeProfileCheck {
 
 const NO_AUTH_REQUIRED_PATHS = ['/login'];
 
+// 2026-07-15: Telefon+SMS OTP orqali veb-kirish TAYYOR (backend, /login sahifasi -
+// bularning barchasi kodda qoladi), lekin SMS provayder (Eskiz) hali ulanmagan va
+// loyiha egasi buni haqiqiy foydalanuvchilarga ko'rsatishdan oldin butun ilovani
+// tasdiqlamoqchi. Shuning uchun bu bayroq FALSE - oddiy foydalanuvchilar hech qachon
+// /login'ga avtomatik yo'naltirilmaydi (Telegram tashqarisida ochilsa, eski xulq -
+// jim, faqat ommaviy ko'rish rejimida ishlaydi). Eskiz ulanib, tasdiqlangach, bu yerni
+// `true`ga o'zgartirish yetarli - qolgan hamma narsa (backend, WebLogin.tsx) tayyor.
+const WEB_LOGIN_ENABLED = false;
+
 // 2026-07-14 (chuqur tahlil natijasida topilgan bo'shliq): Telegram /start -> "Ilovani
 // ochish" -> TelegramAuthGuard birinchi so'rovda avtomatik User yozuvini yaratadi (rol
 // standart CREATOR, lekin creatorProfile/businessProfile HALI yo'q) - lekin frontend'da
 // buni tekshirib /onboarding'ga yo'naltiruvchi hech qanday kod yo'q edi. Natijada yangi
 // foydalanuvchi to'g'ridan-to'g'ri Bosh sahifaga tushib, "kampaniya yo'q" bo'sh holatini
 // ko'rardi - rolni tanlash/profil to'ldirish qadami butunlay ko'rinmas edi.
-//
-// 2026-07-15 (standalone veb-sayt so'rovi) kengaytirildi: endi ilova Telegram
-// TASHQARISIDA ham ochilishi mumkin (oddiy mobil brauzer). Bu holatda Telegram initData
-// yo'q - avval bu holatda ilova "401 - hech narsa bloklanmaydi" tarzida jim ochilardi
-// (creator/business sifatida hech qanday amal bajarib bo'lmasdi). Endi: initData ham,
-// saqlangan veb-sessiya (telefon+OTP orqali olingan JWT) ham yo'q bo'lsa - /login'ga
-// yo'naltiriladi. Ikkalasidan biri bo'lsa, odatdagidek onboarding-tekshiruvi davom etadi.
 function useAppBootstrap() {
   const [checked, setChecked] = useState(false);
   const navigate = useNavigate();
@@ -54,12 +56,14 @@ function useAppBootstrap() {
     let cancelled = false;
 
     const hasTelegram = Boolean(getTelegramWebApp()?.initData);
-    const hasWebSession = Boolean(getWebToken());
+    const hasWebSession = WEB_LOGIN_ENABLED && Boolean(getWebToken());
 
     if (!hasTelegram && !hasWebSession) {
-      if (!NO_AUTH_REQUIRED_PATHS.includes(location.pathname)) {
+      if (WEB_LOGIN_ENABLED && !NO_AUTH_REQUIRED_PATHS.includes(location.pathname)) {
         navigate('/login', { replace: true });
       }
+      // WEB_LOGIN_ENABLED=false bo'lganda: Telegram tashqarisida (401) yoki tarmoq
+      // xatosi - hech narsa bloklanmaydi, ilova odatdagidek (ommaviy ko'rish rejimida) ochiladi.
       setChecked(true);
       return undefined;
     }
@@ -75,11 +79,7 @@ function useAppBootstrap() {
       })
       .catch(() => {
         if (cancelled) return;
-        // Veb-sessiya (JWT) orqali bo'lib, so'rov 401 bilan tugasa - token eskirgan/yaroqsiz,
-        // uni tozalab qayta kirish sahifasiga yo'naltiramiz. Telegram orqali bo'lsa (initData
-        // doim qayta tasdiqlanadi, TelegramAuthGuard avtomatik User yaratadi) bu deyarli hech
-        // qachon sodir bo'lmaydi - shu sabab hech narsa bloklamaymiz (eski xulq saqlanadi).
-        if (hasWebSession && !hasTelegram) {
+        if (WEB_LOGIN_ENABLED && hasWebSession && !hasTelegram) {
           clearWebToken();
           navigate('/login', { replace: true });
         }
