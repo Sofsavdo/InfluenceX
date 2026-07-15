@@ -109,7 +109,16 @@ function SplashScreen() {
 
 export default function App() {
   const location = useLocation();
-  const hideNav = location.pathname === '/onboarding' || location.pathname === '/login';
+  // 2026-07-15 (Collabstr tahlili - "hozirgi holat eski ko'rinadi" muammosi tuzatildi):
+  // "/" manzili avval HAR DOIM Home.tsx (kreator kampaniya lentasi)ni ko'rsatardi - bu
+  // Telegram ICHIDA to'g'ri, lekin ilova oddiy brauzer havolasi sifatida (Telegram
+  // konteksti YO'Q) ochilganda mazmunsiz edi: Home.tsx autentifikatsiya so'raydigan
+  // /campaigns'ga tayanadi, WEB_LOGIN_ENABLED=false bo'lgani uchun bo'sh/eski ko'rinardi.
+  // Endi: Telegram konteksti bo'lmasa, "/" ANIQ Collabstr uslubidagi ommaviy kreator
+  // vitrinasini (BrowseCreators - hech qanday login talab qilmaydi, GET /creators
+  // ommaviy) ko'rsatadi - aynan shu havolani brauzerda ochganda ko'rinadigan narsa.
+  const hasTelegramContext = Boolean(getTelegramWebApp()?.initData);
+  const hideNav = location.pathname === '/onboarding' || location.pathname === '/login' || !hasTelegramContext;
   const checked = useAppBootstrap();
 
   if (!checked) {
@@ -120,7 +129,7 @@ export default function App() {
     <div className="h-full flex flex-col bg-canvas">
       <main className="flex-1 overflow-y-auto w-full max-w-lg mx-auto">
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={hasTelegramContext ? <Home /> : <BrowseCreators />} />
           <Route path="/campaigns/new" element={<CreateCampaign />} />
           <Route path="/campaigns/mine" element={<MyCampaigns />} />
           <Route path="/products" element={<Products />} />

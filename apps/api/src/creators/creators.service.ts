@@ -26,7 +26,13 @@ export class CreatorsService {
     const page = Math.max(1, query.page ?? 1);
     const limit = Math.min(Math.max(1, query.limit ?? 20), 50);
 
-    const where: any = {};
+    const where: any = {
+      // 2026-07-15: nomi to'ldirilmagan (bo'sh) profillar ko'zdan kechirish/qidiruv
+      // natijalarida ko'rsatilmaydi - bular hali onboarding'ni to'liq yakunlamagan yoki
+      // eski (tuzatishdan oldingi) test yozuvlari, Collabstr'da ham to'ldirilmagan
+      // profil vitrina sifatida ko'rinmaydi.
+      name: { not: '' },
+    };
     if (query.category) where.categories = { has: query.category };
     if (query.country) where.country = query.country;
     if (query.minFollowers || query.maxFollowers) {
