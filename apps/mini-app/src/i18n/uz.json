@@ -13,7 +13,16 @@
     "budget": "Byudjet",
     "deadline": "Muddat",
     "apply": "Zayavka berish",
-    "loadMore": "Yana ko'rsatish"
+    "loadMore": "Yana ko'rsatish",
+    "businessGreeting": "Xush kelibsiz",
+    "businessSubtitle": "Kreator toping yoki yangi kampaniya boshlang",
+    "createCampaign": "Kampaniya yaratish",
+    "browseCreatorsAction": "Kreatorlarni ko'rish",
+    "activeCampaignsStat": "Faol kampaniyalar",
+    "recentCampaignsTitle": "So'nggi kampaniyalar",
+    "seeAll": "Barchasini ko'rish",
+    "greetingCreator": "Salom",
+    "feedSubtitle": "Sizga mos ochiq kampaniyalar"
   },
   "onboarding": {
     "welcome": "InfluenceX'ga xush kelibsiz",
@@ -310,7 +319,22 @@
     "minFollowersPlaceholder": "Min. obunachilar soni",
     "empty": "Kreatorlar topilmadi",
     "startingPrice": "{{amount}} {{currency}}dan",
-    "noPrice": "narx ko'rsatilmagan"
+    "noPrice": "narx ko'rsatilmagan",
+    "subtitle": "Byudjetingizga mos kreatorni toping va to'g'ridan-to'g'ri bog'laning",
+    "resultsCount": "{{count}} ta kreator topildi",
+    "resultsCount_zero": "Kreatorlar topilmadi",
+    "allCategories": "Barchasi",
+    "clearFilters": "Filtrlarni tozalash",
+    "categories": {
+      "fashion": "Moda",
+      "beauty": "Go‘zallik",
+      "tech": "Texnologiya",
+      "food": "Ovqat",
+      "fitness": "Fitnes",
+      "travel": "Sayohat",
+      "gaming": "O‘yinlar",
+      "lifestyle": "Turmush tarzi"
+    }
   },
   "creatorProfile": {
     "servicesTitle": "Xizmatlar",

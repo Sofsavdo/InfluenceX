@@ -13,7 +13,16 @@
     "budget": "Бюджет",
     "deadline": "Срок",
     "apply": "Подать заявку",
-    "loadMore": "Показать ещё"
+    "loadMore": "Показать ещё",
+    "businessGreeting": "Добро пожаловать",
+    "businessSubtitle": "Найдите креатора или запустите новую кампанию",
+    "createCampaign": "Создать кампанию",
+    "browseCreatorsAction": "Смотреть креаторов",
+    "activeCampaignsStat": "Активные кампании",
+    "recentCampaignsTitle": "Последние кампании",
+    "seeAll": "Смотреть все",
+    "greetingCreator": "Привет",
+    "feedSubtitle": "Открытые кампании для вас"
   },
   "onboarding": {
     "welcome": "Добро пожаловать в InfluenceX",
@@ -310,7 +319,22 @@
     "minFollowersPlaceholder": "Мин. число подписчиков",
     "empty": "Креаторы не найдены",
     "startingPrice": "от {{amount}} {{currency}}",
-    "noPrice": "цена не указана"
+    "noPrice": "цена не указана",
+    "subtitle": "Найдите креатора под ваш бюджет и свяжитесь напрямую",
+    "resultsCount": "Найдено креаторов: {{count}}",
+    "resultsCount_zero": "Креаторы не найдены",
+    "allCategories": "Все",
+    "clearFilters": "Сбросить фильтры",
+    "categories": {
+      "fashion": "Мода",
+      "beauty": "Красота",
+      "tech": "Технологии",
+      "food": "Еда",
+      "fitness": "Фитнес",
+      "travel": "Путешествия",
+      "gaming": "Игры",
+      "lifestyle": "Лайфстайл"
+    }
   },
   "creatorProfile": {
     "servicesTitle": "Услуги",

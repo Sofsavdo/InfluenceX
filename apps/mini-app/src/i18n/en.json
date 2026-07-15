@@ -13,7 +13,16 @@
     "budget": "Budget",
     "deadline": "Deadline",
     "apply": "Apply",
-    "loadMore": "Load more"
+    "loadMore": "Load more",
+    "businessGreeting": "Welcome",
+    "businessSubtitle": "Find a creator or launch a new campaign",
+    "createCampaign": "Create campaign",
+    "browseCreatorsAction": "Browse creators",
+    "activeCampaignsStat": "Active campaigns",
+    "recentCampaignsTitle": "Recent campaigns",
+    "seeAll": "See all",
+    "greetingCreator": "Hi",
+    "feedSubtitle": "Open campaigns picked for you"
   },
   "onboarding": {
     "welcome": "Welcome to InfluenceX",
@@ -310,7 +319,22 @@
     "minFollowersPlaceholder": "Min. followers",
     "empty": "No creators found",
     "startingPrice": "from {{amount}} {{currency}}",
-    "noPrice": "no price listed"
+    "noPrice": "no price listed",
+    "subtitle": "Find the right creator for your budget and reach out directly",
+    "resultsCount": "{{count}} creators found",
+    "resultsCount_zero": "No creators found",
+    "allCategories": "All",
+    "clearFilters": "Clear filters",
+    "categories": {
+      "fashion": "Fashion",
+      "beauty": "Beauty",
+      "tech": "Tech",
+      "food": "Food",
+      "fitness": "Fitness",
+      "travel": "Travel",
+      "gaming": "Gaming",
+      "lifestyle": "Lifestyle"
+    }
   },
   "creatorProfile": {
     "servicesTitle": "Services",

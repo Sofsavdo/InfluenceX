@@ -114,6 +114,16 @@ body {
   opacity: 0.9;
 }
 
+/* Gorizontal chip qatorlari (kategoriya filtrlari va h.k.) uchun - scrollbar
+   ko'rinishi Telegram Mini App'da g'alati va "veb-sahifa" hissi beradi. */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 /* Telegram xavfsiz zonasi (notch / gesture bar) - pastki fixed elementlar uchun */
 .safe-b {
   padding-bottom: env(safe-area-inset-bottom, 0px);

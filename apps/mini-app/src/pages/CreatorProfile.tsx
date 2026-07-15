@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { MapPin, Eye, Heart, Users } from 'lucide-react';
+import { MapPin, Eye, Heart, Users, Star, MessageCircle } from 'lucide-react';
 import { apiClient } from '../api/client';
 import type { CreatorProfileDto, CreatorPackageDto } from '@influencex/shared';
 import { PageHeader } from '../components/ui/PageHeader';
@@ -11,7 +11,7 @@ import { Avatar } from '../components/ui/Avatar';
 import { StatCard } from '../components/ui/StatCard';
 import { Skeleton } from '../components/ui/Skeleton';
 import { EmptyState } from '../components/ui/EmptyState';
-import { useTelegramBackButton } from '../lib/telegramUI';
+import { useTelegramBackButton, haptic } from '../lib/telegramUI';
 
 interface PortfolioItem {
   id: string;
@@ -26,6 +26,14 @@ function isVideo(url: string) {
 // PRD "Discovery" (Collabstr individual creator page tahlilidan keyin, 2026-07-15):
 // biznes kreatorning to'liq profilini, narx menyusini va ishlarini ko'radi, so'ng
 // to'g'ridan-to'g'ri Telegram orqali bog'lanadi. Barcha uchta endpoint PUBLIC.
+//
+// 2026-07-15 (kech, tuzatish): avval bog'lanish tugmasi FAQAT sahifaning eng
+// pastida (paketlar + portfoliodan keyin) edi - uzun profilda buni topish uchun
+// pastgacha skroll qilish kerak edi. Collabstr'da "Send Message" har doim ekranning
+// yuqori qismida, ism/statistika bilan bir joyda ko'rinadi. Endi xuddi shu tugma
+// statistikadan keyin HAM takrorlanadi - birinchi ekranda ko'rish/skroll qilmasdan
+// harakat qilish mumkin, pastdagi asl tugma esa portfoliodan keyin tabiiy yakun
+// sifatida qoladi. Reyting endi ism yonida ko'rinadi (avval umuman ko'rsatilmasdi).
 export default function CreatorProfile() {
   const { id } = useParams<{ id: string }>();
   const { t } = useTranslation();
@@ -87,11 +95,27 @@ export default function CreatorProfile() {
   const activePackages = packages.filter((p) => p.active);
   const locationLine = [creator.city, creator.country].filter(Boolean).join(', ');
 
+  const ContactButton = ({ compact = false }: { compact?: boolean }) =>
+    telegramHandle ? (
+      <a
+        href={`https://t.me/${telegramHandle.replace(/^@/, '')}`}
+        target="_blank"
+        rel="noreferrer"
+        onClick={() => haptic('light')}
+        className={`tap-scale flex items-center justify-center gap-1.5 w-full min-h-[46px] rounded-xl bg-accent-500 text-white font-semibold text-sm shadow-card ${compact ? 'mb-5' : ''}`}
+      >
+        <MessageCircle size={16} />
+        {t('applicants.contactTelegram')}
+      </a>
+    ) : compact ? null : (
+      <p className="text-center text-xs text-ink-300">{t('applicants.noContactInfo')}</p>
+    );
+
   return (
     <div className="p-4 pb-24">
       <PageHeader back title="" />
 
-      <div className="flex items-center gap-3 mb-5">
+      <div className="flex items-center gap-3 mb-4">
         <Avatar name={creator.name} src={creator.avatarUrl} size={72} />
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1.5">
@@ -102,12 +126,20 @@ export default function CreatorProfile() {
               </Badge>
             )}
           </div>
-          {locationLine && (
-            <p className="text-xs text-ink-400 mt-0.5 inline-flex items-center gap-1">
-              <MapPin size={12} />
-              {locationLine}
-            </p>
-          )}
+          <div className="flex items-center gap-2 mt-0.5">
+            {locationLine && (
+              <p className="text-xs text-ink-400 inline-flex items-center gap-1">
+                <MapPin size={12} />
+                {locationLine}
+              </p>
+            )}
+            {creator.rating > 0 && (
+              <p className="text-xs text-ink-500 inline-flex items-center gap-0.5 font-semibold">
+                <Star size={12} className="fill-warning-dot text-warning-dot" />
+                {creator.rating.toFixed(1)}
+              </p>
+            )}
+          </div>
         </div>
       </div>
 
@@ -124,6 +156,9 @@ export default function CreatorProfile() {
           value={`${creator.engagementRate}%`}
         />
       </div>
+
+      {/* Birinchi ekranda ko'rinadigan asosiy harakat - pastgacha skroll shart emas. */}
+      <ContactButton compact />
 
       {creator.categories.length > 0 && (
         <div className="flex flex-wrap gap-1.5 mb-5">
@@ -186,18 +221,7 @@ export default function CreatorProfile() {
         </>
       )}
 
-      {telegramHandle ? (
-        <a
-          href={`https://t.me/${telegramHandle.replace(/^@/, '')}`}
-          target="_blank"
-          rel="noreferrer"
-          className="tap-scale flex items-center justify-center w-full min-h-[46px] rounded-xl bg-accent-500 text-white font-semibold text-sm shadow-card"
-        >
-          {t('applicants.contactTelegram')}
-        </a>
-      ) : (
-        <p className="text-center text-xs text-ink-300">{t('applicants.noContactInfo')}</p>
-      )}
+      <ContactButton />
     </div>
   );
 }
