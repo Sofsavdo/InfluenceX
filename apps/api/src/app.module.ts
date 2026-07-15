@@ -23,6 +23,9 @@ import { EarningsModule } from './earnings/earnings.module';
 import { AnalyticsModule } from './analytics/analytics.module';
 import { ProductsModule } from './products/products.module';
 import { HealthModule } from './health/health.module';
+import { SmsModule } from './sms/sms.module';
+import { PackagesModule } from './packages/packages.module';
+import { CreatorsModule } from './creators/creators.module';
 
 @Module({
   imports: [
@@ -54,6 +57,9 @@ import { HealthModule } from './health/health.module';
     AnalyticsModule,
     ProductsModule,
     HealthModule,
+    SmsModule,
+    PackagesModule,
+    CreatorsModule,
   ],
   providers: [
     {

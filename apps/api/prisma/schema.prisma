@@ -160,6 +160,10 @@ model User {
   telegramUsername String?
   email            String?  @unique
   passwordHash     String?
+  // 2026-07-15 (Collabstr-uslubidagi standalone veb-sayt so'rovi): Telegram tashqarisida
+  // (oddiy mobil brauzerda) kirish uchun - telefon raqam + bir martalik SMS kod orqali
+  // autentifikatsiya. Telegram foydalanuvchilari buni to'ldirishi shart emas.
+  phone            String?  @unique
   role           UserRole
   language       Language @default(uz)
   createdAt      DateTime @default(now())
@@ -210,6 +214,9 @@ model CreatorProfile {
   payoutAccount    String?             // Uzcard/Humo karta raqami yoki Payme/Click hisob identifikatori
 
   applications     CampaignApplication[]
+  // 2026-07-15 (Collabstr tahlili): kreatorning o'zi narxlagan tayyor xizmatlar menyusi -
+  // biznes kampaniya ochib kutish o'rniga to'g'ridan-to'g'ri "sotib olish"i mumkin.
+  packages         CreatorPackage[]
 
   createdAt        DateTime            @default(now())
   updatedAt        DateTime            @updatedAt
@@ -218,6 +225,51 @@ model CreatorProfile {
   @@index([tier])
   @@index([followers])
   @@map("creator_profiles")
+}
+
+// PRD'da yo'q edi, lekin PRD "Collaboration Models -> Fixed Payment" (masalan
+// "1 Reel = 150,000 UZS") aynan shu narsani anglatadi - Collabstr'dagi kabi kreator
+// o'zi belgilagan, tayyor narxli xizmat sifatida taqdim etiladi. Kampaniya-birinchi
+// oqim (business kampaniya ochadi) bilan bir qatorda ikkinchi, tezroq yo'l: biznes
+// kreator profilida narxni ko'radi va to'g'ridan-to'g'ri buyurtma qiladi.
+model CreatorPackage {
+  id           String          @id @default(uuid())
+  creatorId    String
+  creator      CreatorProfile  @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+
+  platform     Platform
+  contentType  ContentType
+  title        String
+  description  String?
+  price        Decimal         @db.Decimal(14, 2)
+  currency     String          @default("UZS")
+  deliveryDays Int?            // taxminiy yetkazib berish muddati (kun)
+  active       Boolean         @default(true)
+
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  @@index([creatorId])
+  @@index([platform])
+  @@map("creator_packages")
+}
+
+// Telefon + SMS OTP autentifikatsiya (2026-07-15) - foydalanuvchi/User yozuvi bilan
+// bog'lanmagan (kod tasdiqlanmaguncha hali qaysi User ekani noaniq bo'lishi mumkin -
+// yangi ro'yxatdan o'tish holatida User umuman mavjud emas). Shuning uchun mustaqil jadval.
+model OtpCode {
+  id         String    @id @default(uuid())
+  phone      String
+  // Kodning o'zi emas, bcrypt hash'i saqlanadi (passwordHash bilan bir xil naqsh) -
+  // ma'lumotlar bazasi oqsa ham 6 xonali kodlar oshkor bo'lmasin.
+  codeHash   String
+  expiresAt  DateTime
+  consumedAt DateTime?
+  attempts   Int       @default(0)
+  createdAt  DateTime  @default(now())
+
+  @@index([phone])
+  @@map("otp_codes")
 }
 
 model PortfolioItem {

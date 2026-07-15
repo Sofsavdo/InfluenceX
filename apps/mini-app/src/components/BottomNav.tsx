@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Home, ClipboardList, MessageCircle, User } from 'lucide-react';
+import { Home, ClipboardList, MessageCircle, User, Users } from 'lucide-react';
 import { apiClient } from '../api/client';
 
 type UserRole = 'CREATOR' | 'BUSINESS' | 'ADMIN' | 'MODERATOR';
@@ -39,6 +39,10 @@ export function BottomNav() {
     isBusiness
       ? { to: '/campaigns/mine', key: 'myCampaignsTab', Icon: ClipboardList }
       : { to: '/applications', key: 'applications', Icon: ClipboardList },
+    // 2026-07-15 (Collabstr tahlili): biznes uchun kreatorlarni ko'zdan kechirish/qidirish
+    // sahifasi (BrowseCreators.tsx) - faqat BUSINESS rolida ko'rinadi, kreator uchun
+    // ma'nosiz (o'zini qidirmaydi).
+    ...(isBusiness ? [{ to: '/creators', key: 'creators', Icon: Users }] : []),
     { to: '/chat', key: 'chat', Icon: MessageCircle },
     { to: '/profile', key: 'profile', Icon: User },
   ];

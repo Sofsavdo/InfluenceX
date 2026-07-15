@@ -3,6 +3,8 @@ import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { Sparkles } from 'lucide-react';
 import { BottomNav } from './components/BottomNav';
 import { apiClient } from './api/client';
+import { getTelegramWebApp } from './lib/telegram';
+import { getWebToken, clearWebToken } from './lib/webSession';
 import Home from './pages/Home';
 import CampaignDetail from './pages/CampaignDetail';
 import CampaignApplicants from './pages/CampaignApplicants';
@@ -19,11 +21,16 @@ import Onboarding from './pages/Onboarding';
 import CreateCampaign from './pages/CreateCampaign';
 import MyCampaigns from './pages/MyCampaigns';
 import Products from './pages/Products';
+import WebLogin from './pages/WebLogin';
+import BrowseCreators from './pages/BrowseCreators';
+import CreatorProfile from './pages/CreatorProfile';
 
 interface MeProfileCheck {
   creatorProfile?: unknown;
   businessProfile?: unknown;
 }
+
+const NO_AUTH_REQUIRED_PATHS = ['/login'];
 
 // 2026-07-14 (chuqur tahlil natijasida topilgan bo'shliq): Telegram /start -> "Ilovani
 // ochish" -> TelegramAuthGuard birinchi so'rovda avtomatik User yozuvini yaratadi (rol
@@ -32,18 +39,31 @@ interface MeProfileCheck {
 // foydalanuvchi to'g'ridan-to'g'ri Bosh sahifaga tushib, "kampaniya yo'q" bo'sh holatini
 // ko'rardi - rolni tanlash/profil to'ldirish qadami butunlay ko'rinmas edi.
 //
-// Yechim: ilova ochilganda BIR MARTA /users/me so'raladi. Agar foydalanuvchi allaqachon
-// (Telegram orqali) autentifikatsiya qilingan bo'lsa-yu, lekin hali na kreator, na biznes
-// profili to'ldirilmagan bo'lsa - Onboarding'ga yo'naltiriladi. Brauzerda (Telegram
-// tashqarisida, initData'siz) test qilinganda so'rov 401 bilan tugaydi - bu holatda hech
-// narsa bloklanmaydi, ilova odatdagidek (ommaviy ko'rish rejimida) ochiladi.
-function useOnboardingGate() {
+// 2026-07-15 (standalone veb-sayt so'rovi) kengaytirildi: endi ilova Telegram
+// TASHQARISIDA ham ochilishi mumkin (oddiy mobil brauzer). Bu holatda Telegram initData
+// yo'q - avval bu holatda ilova "401 - hech narsa bloklanmaydi" tarzida jim ochilardi
+// (creator/business sifatida hech qanday amal bajarib bo'lmasdi). Endi: initData ham,
+// saqlangan veb-sessiya (telefon+OTP orqali olingan JWT) ham yo'q bo'lsa - /login'ga
+// yo'naltiriladi. Ikkalasidan biri bo'lsa, odatdagidek onboarding-tekshiruvi davom etadi.
+function useAppBootstrap() {
   const [checked, setChecked] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
     let cancelled = false;
+
+    const hasTelegram = Boolean(getTelegramWebApp()?.initData);
+    const hasWebSession = Boolean(getWebToken());
+
+    if (!hasTelegram && !hasWebSession) {
+      if (!NO_AUTH_REQUIRED_PATHS.includes(location.pathname)) {
+        navigate('/login', { replace: true });
+      }
+      setChecked(true);
+      return undefined;
+    }
+
     apiClient
       .get<MeProfileCheck>('/users/me')
       .then((me) => {
@@ -54,7 +74,15 @@ function useOnboardingGate() {
         }
       })
       .catch(() => {
-        // Telegram tashqarisida (401) yoki tarmoq xatosi - onboarding'ni majburlamaymiz.
+        if (cancelled) return;
+        // Veb-sessiya (JWT) orqali bo'lib, so'rov 401 bilan tugasa - token eskirgan/yaroqsiz,
+        // uni tozalab qayta kirish sahifasiga yo'naltiramiz. Telegram orqali bo'lsa (initData
+        // doim qayta tasdiqlanadi, TelegramAuthGuard avtomatik User yaratadi) bu deyarli hech
+        // qachon sodir bo'lmaydi - shu sabab hech narsa bloklamaymiz (eski xulq saqlanadi).
+        if (hasWebSession && !hasTelegram) {
+          clearWebToken();
+          navigate('/login', { replace: true });
+        }
       })
       .finally(() => {
         if (!cancelled) setChecked(true);
@@ -81,8 +109,8 @@ function SplashScreen() {
 
 export default function App() {
   const location = useLocation();
-  const hideNav = location.pathname === '/onboarding';
-  const checked = useOnboardingGate();
+  const hideNav = location.pathname === '/onboarding' || location.pathname === '/login';
+  const checked = useAppBootstrap();
 
   if (!checked) {
     return <SplashScreen />;
@@ -108,6 +136,9 @@ export default function App() {
           <Route path="/analytics/creator" element={<CreatorAnalytics />} />
           <Route path="/analytics/business" element={<BusinessAnalytics />} />
           <Route path="/onboarding" element={<Onboarding />} />
+          <Route path="/login" element={<WebLogin />} />
+          <Route path="/creators" element={<BrowseCreators />} />
+          <Route path="/creators/:id" element={<CreatorProfile />} />
         </Routes>
       </main>
       {!hideNav && <BottomNav />}

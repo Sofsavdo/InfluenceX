@@ -5,6 +5,7 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { TelegramAuthGuard } from './telegram-auth.guard';
 import { JwtAuthGuard } from './jwt-auth.guard';
+import { HybridAuthGuard } from './hybrid-auth.guard';
 
 // @Global(): TelegramAuthGuard/JwtAuthGuard deyarli har bir modulda (@UseGuards orqali)
 // ishlatiladi - har birida alohida "imports: [AuthModule]" yozishdan qochish uchun global qilingan.
@@ -21,7 +22,7 @@ import { JwtAuthGuard } from './jwt-auth.guard';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, TelegramAuthGuard, JwtAuthGuard],
-  exports: [TelegramAuthGuard, JwtAuthGuard, JwtModule],
+  providers: [AuthService, TelegramAuthGuard, JwtAuthGuard, HybridAuthGuard],
+  exports: [TelegramAuthGuard, JwtAuthGuard, HybridAuthGuard, JwtModule],
 })
 export class AuthModule {}

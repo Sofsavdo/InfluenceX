@@ -15,6 +15,40 @@ import {
   SubscriptionPlan,
 } from './enums';
 
+// 2026-07-15 (Collabstr tahlili): kreatorning narxlangan tayyor xizmati.
+export interface CreatorPackageDto {
+  id: string;
+  creatorId: string;
+  platform: Platform;
+  contentType: ContentType;
+  title: string;
+  description?: string;
+  price: number;
+  currency: string;
+  deliveryDays?: number;
+  active: boolean;
+  createdAt: string;
+}
+
+// Kreatorlarni ko'zdan kechirish/qidirish natijasi (Collabstr "Search Creators" uslubi) -
+// CreatorProfileDto'ning qisqartirilgan varianti + eng arzon faol paket narxi
+// ("starting at $X" kartochkasi uchun).
+export interface CreatorDiscoveryDto {
+  id: string;
+  userId: string;
+  name: string;
+  avatarUrl?: string;
+  country?: string;
+  city?: string;
+  categories: string[];
+  followers: number;
+  engagementRate: number;
+  tier: CreatorTier;
+  rating: number;
+  verificationStatus: VerificationStatus;
+  startingPrice?: { amount: number; currency: string };
+}
+
 export interface CreatorRequirement {
   minFollowers?: number;
   maxFollowers?: number;

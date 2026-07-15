@@ -16,20 +16,25 @@ import {
   Globe,
   Plus,
   Check,
+  Package,
+  Trash2,
 } from 'lucide-react';
 import { apiClient } from '../api/client';
 import { uploadFile } from '../lib/upload';
-import { UserRole, PaymentProvider, SubscriptionPlan, SUBSCRIPTION_PLAN_LIMITS, Language } from '@influencex/shared';
+import { UserRole, PaymentProvider, SubscriptionPlan, SUBSCRIPTION_PLAN_LIMITS, Language, ContentType, Platform } from '@influencex/shared';
+import type { CreatorPackageDto } from '@influencex/shared';
 import { PageHeader } from '../components/ui/PageHeader';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
 import { Avatar } from '../components/ui/Avatar';
 import { StatCard } from '../components/ui/StatCard';
-import { Label, Input, Textarea, FormSection, StickyActionBar } from '../components/ui/Field';
+import { Label, Input, Textarea, Select, FormSection, StickyActionBar } from '../components/ui/Field';
 import { LanguageSwitcher, LanguageMultiSelect } from '../components/ui/LanguageSwitcher';
 import { Skeleton } from '../components/ui/Skeleton';
 import { haptic, hapticNotify } from '../lib/telegramUI';
+import { ConfirmDialog, BottomSheet } from '../components/ui/Modal';
+import { useToast } from '../components/ui/Toast';
 
 interface PricingRecommendation {
   currency: 'UZS';
@@ -116,6 +121,7 @@ function SectionTitle({ icon, children }: { icon: ReactNode; children: ReactNode
 // 2026-07-14: dizayn tizimi qo'llanildi - mantiq/API chaqiruvlari o'zgarmagan.
 export default function Profile() {
   const { t, i18n } = useTranslation();
+  const toast = useToast();
   const [me, setMe] = useState<MeResponse | null>(null);
   const [payoutProvider, setPayoutProvider] = useState<PaymentProvider | ''>('');
   const [payoutAccount, setPayoutAccount] = useState('');
@@ -154,6 +160,24 @@ export default function Profile() {
   const [crEngagementRate, setCrEngagementRate] = useState('');
   const [savingCreatorInfo, setSavingCreatorInfo] = useState(false);
   const [creatorInfoError, setCreatorInfoError] = useState<string | null>(null);
+
+  // PRD "Discovery" (Collabstr "Price menu" tahlilidan keyin, 2026-07-15): kreator o'z
+  // narxlangan xizmatlarini (paketlarini) shu yerdan boshqaradi - CreatorProfile.tsx
+  // (public sahifa) shu paketlarni biznesga ko'rsatadi.
+  const [myPackages, setMyPackages] = useState<CreatorPackageDto[]>([]);
+  const [packagesLoading, setPackagesLoading] = useState(false);
+  const [showPackageForm, setShowPackageForm] = useState(false);
+  const [pkgPlatform, setPkgPlatform] = useState<Platform>(Platform.INSTAGRAM);
+  const [pkgContentType, setPkgContentType] = useState<ContentType>(ContentType.REEL);
+  const [pkgTitle, setPkgTitle] = useState('');
+  const [pkgDescription, setPkgDescription] = useState('');
+  const [pkgPrice, setPkgPrice] = useState('');
+  const [pkgDeliveryDays, setPkgDeliveryDays] = useState('');
+  const [savingPackage, setSavingPackage] = useState(false);
+  const [packageFormError, setPackageFormError] = useState<string | null>(null);
+  const [deletePackageTarget, setDeletePackageTarget] = useState<CreatorPackageDto | null>(null);
+  const [deletingPackageId, setDeletingPackageId] = useState<string | null>(null);
+  const [editingPackageId, setEditingPackageId] = useState<string | null>(null);
 
   const [editingBusiness, setEditingBusiness] = useState(false);
   const [bizCompanyName, setBizCompanyName] = useState('');
@@ -208,6 +232,94 @@ export default function Profile() {
   }
 
   useEffect(load, []);
+
+  // Kreator paketlari - faqat creatorProfile mavjud bo'lganda yuklanadi (biznes
+  // foydalanuvchida bu bo'lim umuman ko'rsatilmaydi, quyidagi JSX'dagi shart bilan bir xil).
+  function loadPackages() {
+    setPackagesLoading(true);
+    apiClient
+      .get<CreatorPackageDto[]>('/creator-packages/mine')
+      .then(setMyPackages)
+      .catch(() => setMyPackages([]))
+      .finally(() => setPackagesLoading(false));
+  }
+
+  useEffect(() => {
+    if (me?.creatorProfile) loadPackages();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [me?.creatorProfile]);
+
+  function resetPackageForm() {
+    setEditingPackageId(null);
+    setPkgPlatform(Platform.INSTAGRAM);
+    setPkgContentType(ContentType.REEL);
+    setPkgTitle('');
+    setPkgDescription('');
+    setPkgPrice('');
+    setPkgDeliveryDays('');
+    setPackageFormError(null);
+  }
+
+  function openEditPackage(pkg: CreatorPackageDto) {
+    setEditingPackageId(pkg.id);
+    setPkgPlatform(pkg.platform);
+    setPkgContentType(pkg.contentType);
+    setPkgTitle(pkg.title);
+    setPkgDescription(pkg.description ?? '');
+    setPkgPrice(String(pkg.price));
+    setPkgDeliveryDays(pkg.deliveryDays != null ? String(pkg.deliveryDays) : '');
+    setPackageFormError(null);
+    setShowPackageForm(true);
+  }
+
+  async function submitPackageForm() {
+    if (!pkgTitle.trim() || !pkgPrice) {
+      setPackageFormError(t('common.error') as string);
+      return;
+    }
+    setSavingPackage(true);
+    setPackageFormError(null);
+    try {
+      const body = {
+        platform: pkgPlatform,
+        contentType: pkgContentType,
+        title: pkgTitle.trim(),
+        description: pkgDescription.trim() || undefined,
+        price: Number(pkgPrice),
+        currency: 'UZS',
+        deliveryDays: pkgDeliveryDays ? Number(pkgDeliveryDays) : undefined,
+      };
+      if (editingPackageId) {
+        await apiClient.patch(`/creator-packages/${editingPackageId}`, body);
+        toast.success(t('profile.serviceUpdated') as string);
+      } else {
+        await apiClient.post('/creator-packages', body);
+        toast.success(t('profile.serviceCreated') as string);
+      }
+      resetPackageForm();
+      setShowPackageForm(false);
+      loadPackages();
+    } catch (e) {
+      setPackageFormError((e as Error).message);
+      toast.error((e as Error).message);
+    } finally {
+      setSavingPackage(false);
+    }
+  }
+
+  async function deletePackage(pkg: CreatorPackageDto) {
+    setDeletingPackageId(pkg.id);
+    try {
+      await apiClient.delete(`/creator-packages/${pkg.id}`);
+      toast.success(t('profile.serviceDeleted') as string);
+      loadPackages();
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setDeletingPackageId(null);
+      setDeletePackageTarget(null);
+    }
+  }
 
   function toggleLanguage(lang: Language) {
     setCrLanguages((prev) => (prev.includes(lang) ? prev.filter((l) => l !== lang) : [...prev, lang]));
@@ -542,6 +654,153 @@ export default function Profile() {
               </div>
             )}
           </Card>
+
+          {/* PRD "Discovery" (Collabstr "Price menu" tahlilidan keyin, 2026-07-15): kreator
+              o'z narxlangan xizmatlarini (paketlarini) shu yerdan qo'shadi/tahrirlaydi -
+              CreatorProfile.tsx (public sahifa) shu paketlarni biznesga ko'rsatadi. */}
+          <Card className="mb-4">
+            <div className="flex justify-between items-center mb-3">
+              <SectionTitle icon={<Package size={16} className="text-accent-500" />}>
+                {t('profile.servicesSectionTitle')}
+              </SectionTitle>
+              <button
+                onClick={() => {
+                  haptic('light');
+                  resetPackageForm();
+                  setShowPackageForm(true);
+                }}
+                className="tap-scale text-xs font-medium text-accent-600 shrink-0 inline-flex items-center gap-1"
+              >
+                <Plus size={12} />
+                {t('profile.addService')}
+              </button>
+            </div>
+
+            {packagesLoading && <Skeleton className="h-16 w-full mb-2" />}
+
+            {!packagesLoading && myPackages.length === 0 && (
+              <p className="text-xs text-ink-400">{t('profile.serviceEmpty')}</p>
+            )}
+
+            <div className="space-y-2">
+              {myPackages.map((pkg) => (
+                <div key={pkg.id} className="rounded-xl border border-ink-100 p-3">
+                  <div className="flex justify-between items-start gap-2">
+                    <div className="min-w-0 flex-1">
+                      <p className="font-semibold text-ink-900 text-sm truncate">{pkg.title}</p>
+                      <p className="text-xs text-ink-400 mt-0.5">
+                        {pkg.platform} · {pkg.contentType} · {pkg.price.toLocaleString()} {pkg.currency}
+                      </p>
+                    </div>
+                    <Badge tone={pkg.active ? 'success' : 'neutral'} className="shrink-0">
+                      {pkg.active ? t('profile.serviceActive') : t('profile.serviceInactive')}
+                    </Badge>
+                  </div>
+                  <div className="flex gap-2 mt-2">
+                    <button
+                      onClick={() => {
+                        haptic('light');
+                        openEditPackage(pkg);
+                      }}
+                      className="tap-scale text-accent-600 text-xs inline-flex items-center gap-1"
+                    >
+                      <Pencil size={12} />
+                      {t('common.edit')}
+                    </button>
+                    <button
+                      onClick={() => setDeletePackageTarget(pkg)}
+                      disabled={deletingPackageId === pkg.id}
+                      className="tap-scale text-danger-text text-xs inline-flex items-center gap-1 disabled:opacity-50"
+                    >
+                      <Trash2 size={12} />
+                      {t('common.delete')}
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          <BottomSheet
+            open={showPackageForm}
+            onClose={() => {
+              setShowPackageForm(false);
+              resetPackageForm();
+            }}
+            title={(editingPackageId ? t('common.edit') : t('profile.addService')) as string}
+          >
+            <div className="space-y-4">
+              <div>
+                <Label>{t('profile.servicePlatformField')}</Label>
+                <Select value={pkgPlatform} onChange={(e) => setPkgPlatform(e.target.value as Platform)}>
+                  {Object.values(Platform).map((p) => (
+                    <option key={p} value={p}>
+                      {p}
+                    </option>
+                  ))}
+                </Select>
+              </div>
+              <div>
+                <Label>{t('profile.serviceContentTypeField')}</Label>
+                <Select value={pkgContentType} onChange={(e) => setPkgContentType(e.target.value as ContentType)}>
+                  {Object.values(ContentType).map((c) => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
+                  ))}
+                </Select>
+              </div>
+              <div>
+                <Label>{t('profile.serviceTitleField')}</Label>
+                <Input value={pkgTitle} onChange={(e) => setPkgTitle(e.target.value)} invalid={!pkgTitle.trim() && Boolean(packageFormError)} />
+              </div>
+              <div>
+                <Label>{t('profile.serviceDescriptionField')}</Label>
+                <Textarea rows={2} value={pkgDescription} onChange={(e) => setPkgDescription(e.target.value)} />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label hint="UZS">{t('profile.servicePriceField')}</Label>
+                  <Input
+                    type="number"
+                    inputMode="decimal"
+                    min={0}
+                    value={pkgPrice}
+                    onChange={(e) => setPkgPrice(e.target.value)}
+                    invalid={!pkgPrice && Boolean(packageFormError)}
+                  />
+                </div>
+                <div>
+                  <Label>{t('profile.serviceDeliveryDaysField')}</Label>
+                  <Input
+                    type="number"
+                    inputMode="numeric"
+                    min={0}
+                    value={pkgDeliveryDays}
+                    onChange={(e) => setPkgDeliveryDays(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              {packageFormError && <p className="text-danger-text text-xs">{packageFormError}</p>}
+
+              <Button full size="lg" loading={savingPackage} onClick={submitPackageForm}>
+                {t('common.save')}
+              </Button>
+            </div>
+          </BottomSheet>
+
+          <ConfirmDialog
+            open={!!deletePackageTarget}
+            onClose={() => setDeletePackageTarget(null)}
+            onConfirm={() => deletePackageTarget && deletePackage(deletePackageTarget)}
+            title={t('common.delete') as string}
+            description={t('profile.serviceDeleteConfirm') as string}
+            confirmLabel={t('common.delete') as string}
+            cancelLabel={t('common.cancel') as string}
+            tone="danger"
+            loading={!!deletePackageTarget && deletingPackageId === deletePackageTarget.id}
+          />
 
           <div className="grid grid-cols-3 gap-2 mb-4">
             <Link to="/portfolio">

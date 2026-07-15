@@ -4,7 +4,8 @@
     "applications": "Заявки",
     "myCampaignsTab": "Мои кампании",
     "chat": "Чат",
-    "profile": "Профиль"
+    "profile": "Профиль",
+    "creators": "Креаторы"
   },
   "home": {
     "title": "Кампании",
@@ -63,7 +64,22 @@
     "descriptionFieldBiz": "Описание компании",
     "industryField": "Сфера деятельности",
     "websiteField": "Веб-сайт",
-    "contactPersonField": "Контактное лицо"
+    "contactPersonField": "Контактное лицо",
+    "servicesSectionTitle": "Мои услуги",
+    "addService": "Добавить новую услугу",
+    "servicePlatformField": "Платформа",
+    "serviceContentTypeField": "Тип контента",
+    "serviceTitleField": "Название услуги",
+    "serviceDescriptionField": "Описание (необязательно)",
+    "servicePriceField": "Цена (UZS)",
+    "serviceDeliveryDaysField": "Срок выполнения, дней (необязательно)",
+    "serviceEmpty": "Услуги ещё не добавлены",
+    "serviceCreated": "Услуга добавлена",
+    "serviceUpdated": "Услуга обновлена",
+    "serviceDeleted": "Услуга удалена",
+    "serviceDeleteConfirm": "Удалить эту услугу?",
+    "serviceActive": "Активна",
+    "serviceInactive": "Неактивна"
   },
   "ratings": {
     "rateTitle": "Оцените сотрудничество",
@@ -87,7 +103,8 @@
     "save": "Сохранить",
     "cancel": "Отмена",
     "send": "Отправить",
-    "delete": "Удалить"
+    "delete": "Удалить",
+    "edit": "Редактировать"
   },
   "createCampaign": {
     "title": "Создать кампанию",
@@ -273,5 +290,32 @@
       "growth": "Growth",
       "pro": "Pro"
     }
+  },
+  "webLogin": {
+    "title": "Вход",
+    "subtitle": "Введите номер телефона, мы отправим код подтверждения",
+    "phoneLabel": "Номер телефона",
+    "phonePlaceholder": "+998901234567",
+    "sendCode": "Отправить код",
+    "codeSentTitle": "Введите код",
+    "codeSentSubtitle": "Введите 6-значный код, отправленный на",
+    "codeLabel": "Код подтверждения",
+    "verify": "Подтвердить",
+    "changeNumber": "Изменить номер",
+    "resend": "Отправить код повторно"
+  },
+  "browseCreators": {
+    "title": "Креаторы",
+    "categoryPlaceholder": "Категория (напр.: мода, техника)",
+    "minFollowersPlaceholder": "Мин. число подписчиков",
+    "empty": "Креаторы не найдены",
+    "startingPrice": "от {{amount}} {{currency}}",
+    "noPrice": "цена не указана"
+  },
+  "creatorProfile": {
+    "servicesTitle": "Услуги",
+    "noServices": "Услуги пока не добавлены",
+    "deliveryDays": "~{{days}} дней",
+    "notFoundTitle": "Креатор не найден"
   }
 }

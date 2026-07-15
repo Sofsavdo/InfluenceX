@@ -4,7 +4,8 @@
     "applications": "Zayavkalar",
     "myCampaignsTab": "Kampaniyalarim",
     "chat": "Chat",
-    "profile": "Profil"
+    "profile": "Profil",
+    "creators": "Kreatorlar"
   },
   "home": {
     "title": "Kampaniyalar",
@@ -63,7 +64,22 @@
     "descriptionFieldBiz": "Kompaniya tavsifi",
     "industryField": "Soha",
     "websiteField": "Veb-sayt",
-    "contactPersonField": "Kontakt shaxs"
+    "contactPersonField": "Kontakt shaxs",
+    "servicesSectionTitle": "Xizmatlar narxlari",
+    "addService": "Yangi xizmat qo'shish",
+    "servicePlatformField": "Platforma",
+    "serviceContentTypeField": "Kontent turi",
+    "serviceTitleField": "Xizmat nomi",
+    "serviceDescriptionField": "Tavsif (ixtiyoriy)",
+    "servicePriceField": "Narx (UZS)",
+    "serviceDeliveryDaysField": "Yetkazish muddati, kun (ixtiyoriy)",
+    "serviceEmpty": "Hali xizmat qo'shilmagan",
+    "serviceCreated": "Xizmat qo'shildi",
+    "serviceUpdated": "Xizmat yangilandi",
+    "serviceDeleted": "Xizmat o'chirildi",
+    "serviceDeleteConfirm": "Bu xizmatni o'chirishni xohlaysizmi?",
+    "serviceActive": "Faol",
+    "serviceInactive": "Nofaol"
   },
   "ratings": {
     "rateTitle": "Hamkorlikni baholang",
@@ -87,7 +103,8 @@
     "save": "Saqlash",
     "cancel": "Bekor qilish",
     "send": "Yuborish",
-    "delete": "O'chirish"
+    "delete": "O'chirish",
+    "edit": "Tahrirlash"
   },
   "createCampaign": {
     "title": "Kampaniya yaratish",
@@ -273,5 +290,32 @@
       "growth": "Growth",
       "pro": "Pro"
     }
+  },
+  "webLogin": {
+    "title": "Kirish",
+    "subtitle": "Telefon raqamingizni kiriting, tasdiqlash kodi yuboramiz",
+    "phoneLabel": "Telefon raqam",
+    "phonePlaceholder": "+998901234567",
+    "sendCode": "Kod yuborish",
+    "codeSentTitle": "Kodni kiriting",
+    "codeSentSubtitle": "raqamiga yuborilgan 6 xonali kodni kiriting",
+    "codeLabel": "Tasdiqlash kodi",
+    "verify": "Tasdiqlash",
+    "changeNumber": "Raqamni almashtirish",
+    "resend": "Kodni qayta yuborish"
+  },
+  "browseCreators": {
+    "title": "Kreatorlar",
+    "categoryPlaceholder": "Kategoriya (masalan: fashion, tech)",
+    "minFollowersPlaceholder": "Min. obunachilar soni",
+    "empty": "Kreatorlar topilmadi",
+    "startingPrice": "{{amount}} {{currency}}dan",
+    "noPrice": "narx ko'rsatilmagan"
+  },
+  "creatorProfile": {
+    "servicesTitle": "Xizmatlar",
+    "noServices": "Xizmatlar hali qo'shilmagan",
+    "deliveryDays": "~{{days}} kun ichida",
+    "notFoundTitle": "Kreator topilmadi"
   }
 }

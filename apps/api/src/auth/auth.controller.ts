@@ -4,6 +4,8 @@ import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
 import { TelegramAuthGuard } from './telegram-auth.guard';
 import { AdminLoginDto } from './dto/admin-login.dto';
+import { RequestOtpDto } from './dto/request-otp.dto';
+import { VerifyOtpDto } from './dto/verify-otp.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -29,5 +31,23 @@ export class AuthController {
   @Post('admin/login')
   async loginAdmin(@Body() dto: AdminLoginDto) {
     return this.authService.loginAdmin(dto.email, dto.password);
+  }
+
+  /**
+   * 2026-07-15: Telegram tashqarisidagi (oddiy mobil brauzer) foydalanuvchilar uchun
+   * telefon + SMS OTP kirish - 1-bosqich (kod yuborish). Qo'pol kuch/SMS-bomber
+   * hujumidan himoya uchun qattiq limit (1 daqiqada 3 urinish/IP) - AuthService o'zi
+   * ham bir xil raqamga qayta-qayta yuborishni cheklaydi (raqam darajasida).
+   */
+  @Throttle({ default: { limit: 3, ttl: 60000 } })
+  @Post('request-otp')
+  async requestOtp(@Body() dto: RequestOtpDto) {
+    return this.authService.requestOtp(dto.phone);
+  }
+
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
+  @Post('verify-otp')
+  async verifyOtp(@Body() dto: VerifyOtpDto) {
+    return this.authService.verifyOtp(dto.phone, dto.code);
   }
 }

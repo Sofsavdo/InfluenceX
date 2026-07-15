@@ -4,7 +4,8 @@
     "applications": "Applications",
     "myCampaignsTab": "My Campaigns",
     "chat": "Chat",
-    "profile": "Profile"
+    "profile": "Profile",
+    "creators": "Creators"
   },
   "home": {
     "title": "Campaigns",
@@ -63,7 +64,22 @@
     "descriptionFieldBiz": "Company description",
     "industryField": "Industry",
     "websiteField": "Website",
-    "contactPersonField": "Contact person"
+    "contactPersonField": "Contact person",
+    "servicesSectionTitle": "My services",
+    "addService": "Add new service",
+    "servicePlatformField": "Platform",
+    "serviceContentTypeField": "Content type",
+    "serviceTitleField": "Service title",
+    "serviceDescriptionField": "Description (optional)",
+    "servicePriceField": "Price (UZS)",
+    "serviceDeliveryDaysField": "Delivery time, days (optional)",
+    "serviceEmpty": "No services added yet",
+    "serviceCreated": "Service added",
+    "serviceUpdated": "Service updated",
+    "serviceDeleted": "Service deleted",
+    "serviceDeleteConfirm": "Delete this service?",
+    "serviceActive": "Active",
+    "serviceInactive": "Inactive"
   },
   "ratings": {
     "rateTitle": "Rate the collaboration",
@@ -87,7 +103,8 @@
     "save": "Save",
     "cancel": "Cancel",
     "send": "Send",
-    "delete": "Delete"
+    "delete": "Delete",
+    "edit": "Edit"
   },
   "createCampaign": {
     "title": "Create campaign",
@@ -273,5 +290,32 @@
       "growth": "Growth",
       "pro": "Pro"
     }
+  },
+  "webLogin": {
+    "title": "Log in",
+    "subtitle": "Enter your phone number, we'll send a verification code",
+    "phoneLabel": "Phone number",
+    "phonePlaceholder": "+998901234567",
+    "sendCode": "Send code",
+    "codeSentTitle": "Enter the code",
+    "codeSentSubtitle": "Enter the 6-digit code sent to",
+    "codeLabel": "Verification code",
+    "verify": "Verify",
+    "changeNumber": "Change number",
+    "resend": "Resend code"
+  },
+  "browseCreators": {
+    "title": "Creators",
+    "categoryPlaceholder": "Category (e.g. fashion, tech)",
+    "minFollowersPlaceholder": "Min. followers",
+    "empty": "No creators found",
+    "startingPrice": "from {{amount}} {{currency}}",
+    "noPrice": "no price listed"
+  },
+  "creatorProfile": {
+    "servicesTitle": "Services",
+    "noServices": "No services added yet",
+    "deliveryDays": "~{{days}} days",
+    "notFoundTitle": "Creator not found"
   }
 }
