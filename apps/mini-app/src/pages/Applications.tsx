@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState, type ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { Paperclip, CheckCircle2, ChevronRight, ClipboardList } from 'lucide-react';
-import { apiClient } from '../api/client';
+import { Paperclip, CheckCircle2, ChevronRight, ClipboardList, Copy, Check } from 'lucide-react';
+import { apiClient, API_BASE_URL } from '../api/client';
 import { uploadFile } from '../lib/upload';
 import { DisputeForm } from '../components/DisputeForm';
 import { ConversionsPanel } from '../components/ConversionsPanel';
@@ -16,6 +16,7 @@ import { EmptyState } from '../components/ui/EmptyState';
 import { StatusBadge } from '../components/ui/Badge';
 import { Input, Textarea } from '../components/ui/Field';
 import { Button } from '../components/ui/Button';
+import { useToast } from '../components/ui/Toast';
 
 type ApplicationWithEscrow = ApplicationDto & {
   escrow?: EscrowDto | null;
@@ -43,7 +44,23 @@ export default function Applications() {
   const [savingContent, setSavingContent] = useState(false);
   const [contentError, setContentError] = useState<string | null>(null);
   const [disputeForEscrowId, setDisputeForEscrowId] = useState<string | null>(null);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
   const contentFileInputRef = useRef<HTMLInputElement>(null);
+  const toast = useToast();
+
+  // 2026-07-15 (raqobatchi tahlili - Perfluence "promo-kod ulashish" asosiy sikli):
+  // CampaignApplication.referralCode va GET /track/:applicationId (bosishlarni hisoblab,
+  // campaign.landingUrl'ga yo'naltiruvchi ochiq endpoint) backend'da ALLAQACHON to'liq
+  // ishlagan - lekin hech qanday ekran kreatorga bu havolani ko'rsatmagani uchun CPA/Hybrid
+  // kampaniyalarda kreator o'z kuzatuv havolasini HECH QACHON topa olmas edi.
+  function copyTrackingLink(applicationId: string) {
+    const url = `${API_BASE_URL}/track/${applicationId}`;
+    navigator.clipboard.writeText(url).then(() => {
+      setCopiedId(applicationId);
+      toast.success(t('applications.linkCopied') as string);
+      window.setTimeout(() => setCopiedId((cur) => (cur === applicationId ? null : cur)), 2000);
+    });
+  }
 
   function load() {
     setLoading(true);
@@ -175,6 +192,30 @@ export default function Applications() {
               {t('applications.contentSubmittedOn')} {new Date(app.contentSubmittedAt).toLocaleDateString()}
             </div>
           )}
+
+          {/* PRD "CPA"/"Hybrid": kreatorning shaxsiy kuzatuv havolasi - avval bu ekranda
+              umuman ko'rsatilmagan edi (backend allaqachon tayyor edi). */}
+          {app.status === ApplicationStatus.ACCEPTED &&
+            app.campaign?.collaborationModel &&
+            (app.campaign.collaborationModel === CollaborationModel.CPA ||
+              app.campaign.collaborationModel === CollaborationModel.HYBRID) && (
+              <div className="mt-3 rounded-xl border border-accent-100 bg-accent-50 p-3">
+                <p className="text-xs font-semibold text-accent-700">{t('applications.trackingLinkTitle')}</p>
+                <p className="text-[11px] text-accent-700/70 mt-0.5 mb-2">{t('applications.trackingLinkHint')}</p>
+                <div className="flex items-center gap-2">
+                  <code className="min-w-0 flex-1 truncate rounded-lg bg-white px-2.5 py-2 text-xs text-ink-700 border border-accent-100">
+                    {`${API_BASE_URL}/track/${app.id}`}
+                  </code>
+                  <button
+                    onClick={() => copyTrackingLink(app.id)}
+                    aria-label={t('applications.copyLink') as string}
+                    className="tap-scale h-9 w-9 shrink-0 rounded-lg bg-accent-500 text-white flex items-center justify-center"
+                  >
+                    {copiedId === app.id ? <Check size={15} /> : <Copy size={15} />}
+                  </button>
+                </div>
+              </div>
+            )}
 
           {/* PRD "CPA"/"Hybrid": kreator o'z konversiyalari va kutilayotgan to'lovlarini kuzatadi */}
           {app.status === ApplicationStatus.ACCEPTED &&

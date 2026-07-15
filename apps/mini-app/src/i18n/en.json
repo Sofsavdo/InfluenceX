@@ -148,7 +148,9 @@
     "approveAndRelease": "Approve & release payment",
     "waitingForContent": "Creator hasn't submitted content yet - wait before releasing payment",
     "refund": "Cancel (refund)",
-    "refundConfirm": "Are you sure you want to cancel this escrow and refund the funds?"
+    "refundConfirm": "Are you sure you want to cancel this escrow and refund the funds?",
+    "contactTelegram": "Contact on Telegram",
+    "noContactInfo": "No contact info"
   },
   "chat": {
     "attach": "Attach file",
@@ -171,7 +173,11 @@
     "uploadInstead": "or upload a file",
     "contentNotePlaceholder": "Note (optional)",
     "sendContent": "Send",
-    "contentSubmittedOn": "Content submitted:"
+    "contentSubmittedOn": "Content submitted:",
+    "trackingLinkTitle": "Your tracking link",
+    "trackingLinkHint": "Share this link with your audience — every click and sale is counted automatically.",
+    "copyLink": "Copy link",
+    "linkCopied": "Copied"
   },
   "conversions": {
     "title": "Conversions (CPA)",

@@ -36,6 +36,10 @@ interface CreatorMatch {
     tier: string;
     country: string | null;
     creatorScore: number;
+    // 2026-07-15 (raqobatchi tahlili - Collabstr): tavsiya etilgan kreator kartasi
+    // avval FAQAT ma'lumot edi - hech qanday harakat tugmasi yo'q edi (foydali mos kelish
+    // topilsa ham, biznes hech narsa qila olmasdi). Endi Telegram orqali bog'lanish mumkin.
+    socialLinks?: Record<string, string> | null;
   };
   score: number;
 }
@@ -387,17 +391,31 @@ export default function CampaignApplicants() {
             {recommended
               .filter((m) => !appliedCreatorIds.has(m.creator.id))
               .map((m) => (
-                <Card key={m.creator.id} className="flex justify-between items-center">
-                  <div>
-                    <p className="font-medium text-sm text-ink-900">{m.creator.name}</p>
-                    <p className="text-xs text-ink-400 mt-0.5">
-                      {m.creator.followers.toLocaleString()} {t('applicants.followers')} · {m.creator.tier}
-                      {m.creator.country ? ` · ${m.creator.country}` : ''}
-                    </p>
+                <Card key={m.creator.id}>
+                  <div className="flex justify-between items-center gap-2">
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate font-medium text-sm text-ink-900">{m.creator.name}</p>
+                      <p className="text-xs text-ink-400 mt-0.5 truncate">
+                        {m.creator.followers.toLocaleString()} {t('applicants.followers')} · {m.creator.tier}
+                        {m.creator.country ? ` · ${m.creator.country}` : ''}
+                      </p>
+                    </div>
+                    <Badge tone="info" className="shrink-0">
+                      {m.score}%
+                    </Badge>
                   </div>
-                  <Badge tone="info" className="shrink-0">
-                    {m.score}%
-                  </Badge>
+                  {m.creator.socialLinks?.TELEGRAM ? (
+                    <a
+                      href={`https://t.me/${m.creator.socialLinks.TELEGRAM.replace(/^@/, '')}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="tap-scale mt-2.5 flex items-center justify-center gap-1.5 rounded-lg bg-accent-50 text-accent-700 text-xs font-semibold py-2"
+                    >
+                      {t('applicants.contactTelegram')}
+                    </a>
+                  ) : (
+                    <p className="mt-2.5 text-center text-xs text-ink-300">{t('applicants.noContactInfo')}</p>
+                  )}
                 </Card>
               ))}
           </div>

@@ -10,6 +10,7 @@ interface CreatorProfileRow {
   engagementRate: number;
   tier: string;
   country: string | null;
+  city: string | null;
   categories: string[];
   languages: string[];
   socialLinks: Record<string, unknown> | null;
@@ -35,9 +36,16 @@ export interface CreatorMatch {
     engagementRate: number;
     tier: string;
     country: string | null;
+    city: string | null;
     categories: string[];
     creatorScore: number;
     rating: number;
+    // 2026-07-15 (raqobatchi tahlili - Collabstr): bu ma'lumot allaqachon so'ralayotgan
+    // `candidates` qatoridan mavjud edi (CreatorProfileRow.socialLinks) - lekin qaytarilgan
+    // obyektga qo'shilmagani uchun UI "tavsiya etilgan kreator bilan bog'lanish" tugmasini
+    // hech qachon ko'rsata olmas edi (Collabstr'da har bir tavsiya etilgan kreator kartasida
+    // to'g'ridan-to'g'ri bog'lanish imkoniyati bor - bizda ma'lumot bor edi, chiqarilmagan edi).
+    socialLinks: Record<string, unknown> | null;
   };
   score: number; // 0-100
   breakdown: Record<string, number>; // har bir omilning 0-1 qiymati (tushuntirish uchun)
@@ -146,9 +154,11 @@ export class MatchingService {
         engagementRate: creator.engagementRate,
         tier: creator.tier,
         country: creator.country ?? null,
+        city: (creator as any).city ?? null,
         categories: creator.categories ?? [],
         creatorScore: creator.creatorScore,
         rating: creator.rating,
+        socialLinks: creator.socialLinks ?? null,
       },
       score,
       breakdown,

@@ -148,7 +148,9 @@
     "approveAndRelease": "Ishni tasdiqlash va to'lovni chiqarish",
     "waitingForContent": "Kreator hali kontent yubormagan - to'lovni chiqarish uchun kuting",
     "refund": "Bekor qilish (qaytarish)",
-    "refundConfirm": "Haqiqatan ham bu escrow'ni bekor qilib, mablag'ni qaytarmoqchimisiz?"
+    "refundConfirm": "Haqiqatan ham bu escrow'ni bekor qilib, mablag'ni qaytarmoqchimisiz?",
+    "contactTelegram": "Telegram orqali bog‘lanish",
+    "noContactInfo": "Kontakt ma’lumoti yo‘q"
   },
   "chat": {
     "attach": "Fayl biriktirish",
@@ -171,7 +173,11 @@
     "uploadInstead": "yoki fayl yuklash",
     "contentNotePlaceholder": "Izoh (ixtiyoriy)",
     "sendContent": "Yuborish",
-    "contentSubmittedOn": "Kontent topshirildi:"
+    "contentSubmittedOn": "Kontent topshirildi:",
+    "trackingLinkTitle": "Sizning kuzatuv havolangiz",
+    "trackingLinkHint": "Bu havolani auditoriyangiz bilan ulashing — har bir bosish va sotuv avtomatik hisoblanadi.",
+    "copyLink": "Havolani nusxalash",
+    "linkCopied": "Nusxalandi"
   },
   "conversions": {
     "title": "Konversiyalar (CPA)",

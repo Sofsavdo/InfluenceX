@@ -148,7 +148,9 @@
     "approveAndRelease": "Подтвердить и выплатить",
     "waitingForContent": "Креатор ещё не отправил контент - подождите перед выплатой",
     "refund": "Отменить (вернуть средства)",
-    "refundConfirm": "Вы уверены, что хотите отменить этот escrow и вернуть средства?"
+    "refundConfirm": "Вы уверены, что хотите отменить этот escrow и вернуть средства?",
+    "contactTelegram": "Связаться в Telegram",
+    "noContactInfo": "Нет контактных данных"
   },
   "chat": {
     "attach": "Прикрепить файл",
@@ -171,7 +173,11 @@
     "uploadInstead": "или загрузить файл",
     "contentNotePlaceholder": "Комментарий (необязательно)",
     "sendContent": "Отправить",
-    "contentSubmittedOn": "Контент отправлен:"
+    "contentSubmittedOn": "Контент отправлен:",
+    "trackingLinkTitle": "Ваша отслеживаемая ссылка",
+    "trackingLinkHint": "Поделитесь этой ссылкой с аудиторией — каждый клик и продажа считаются автоматически.",
+    "copyLink": "Скопировать ссылку",
+    "linkCopied": "Скопировано"
   },
   "conversions": {
     "title": "Конверсии (CPA)",

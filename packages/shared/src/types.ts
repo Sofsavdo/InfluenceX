@@ -95,6 +95,12 @@ export interface ApplicationDto {
   contentUrls?: string[];
   contentNote?: string | null;
   createdAt: string;
+  // 2026-07-15 (raqobatchi tahlili - Perfluence): bu maydon Prisma darajasida va
+  // /applications/mine javobida ALLAQACHON mavjud edi (CampaignApplication.referralCode,
+  // @default(cuid())) - lekin shared turlar faylida e'lon qilinmagani uchun frontend'da
+  // hech qachon ishlatilmagan edi. CPA/Hybrid kampaniyalarda kreatorning shaxsiy kuzatuv
+  // havolasini (GET /track/:applicationId) yasash uchun kerak.
+  referralCode?: string;
 }
 
 // PRD "CPA (Cost Per Action)" - 2026-07-11 qo'shildi
